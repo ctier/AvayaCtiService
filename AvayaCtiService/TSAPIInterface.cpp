@@ -469,7 +469,7 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
 		}
 	}break;
-	case CSTA_PICKUP_CALL_CONF://电话转移 AgentPickupCall
+	case CSTA_PICKUP_CALL_CONF://电话代接 AgentPickupCall
 	{
 		if (ActName == "AgentPickupCall")
 		{
@@ -665,6 +665,18 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 		}// end of switch
 	}// end of Query Agent State
 	break;
+	case CSTA_SNAPSHOT_DEVICE_CONF:
+	{
+		if (ActName == "AgentSnapshotDevice") {
+			ConnectionID_t   newCall = cstaEvent.event.cstaConfirmation.u.consultationCall.newCall;
+			mes["callId"] = to_string(newCall.callID);
+			mes["deivceId"] = DeviceID;
+			m_DeviceCallID[DeviceID]= to_string(newCall.callID);//save the device's callid to map
+			res = ReturnMes(mes);
+			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
+			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+		}
+	}break;
 	case CSTA_UNIVERSAL_FAILURE_CONF :
 	{
 		// Universal Failure Event is received.
@@ -898,6 +910,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		mes["devIDType"] = devIDType;
 		mes["called_devID"] = called_devID;
 		mes["calling_devID"] = calling_devID;
+		mes["callID"] = to_string(callID);
 
 		DeviceID = called_devID;
 		res = ReturnMes(mes);
@@ -917,7 +930,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		DeviceID = m_answeringdevID;
 		mes["answeringDevice"] = m_answeringdevID;
 		mes["callingDevice"] = m_callingDevID;
-		mes["callID"] = usCallID;
+		mes["callID"] = to_string(usCallID);
 
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
@@ -1020,7 +1033,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 
 		}
 		DeviceID = holding_DevID;
-		mes["usCallID"] = usCallID;
+		mes["usCallID"] = to_string(usCallID);
 		mes["holding_DevID"] = holding_DevID;
 
 		res = ReturnMes(mes);
@@ -1469,6 +1482,48 @@ void TSAPIInterface ::AgentAnswerCall(DeviceID_t deviceID, long callID)
 }
 
 /// <summary>
+/// This function helps in clear device in a call connection.
+/// </summary>
+/// <param name="deviceID">Calling object will pass device ID of device where call has come in this variable.</param>
+/// <param name="callID">Calling object will pass call ID which it want to answer in this variable.</param>
+void TSAPIInterface::AgentClearConnection(DeviceID_t deviceID, long callID)
+{
+	ConnectionID_t m_stConnectionID;
+	m_stConnectionID.devIDType = STATIC_ID;
+	strcpy((char *)&m_stConnectionID.deviceID, (char *)deviceID);
+	m_stConnectionID.callID = callID;
+	m_nRetCode = cstaClearConnection(m_lAcsHandle			// handle return by acsOpenStream method
+		, (InvokeID_t)++m_ulInvokeID // application generated InvokedID
+		, (ConnectionID_t *)&m_stConnectionID // Connection Identifier
+		, NULL);					// Private Data is optional and set as NULL here
+	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+	m_InvokeID2ActName[m_ulInvokeID] = "AgentClearConnection";
+
+	if (m_nRetCode < 0)
+	{
+		// TSAPI Client Library has rejected the request.
+		// either one or More parameter bad or AcsHandle is Invalid
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// Acshandle is Invalid
+		}break;
+		case ACSERR_BADPARAMETER:
+		{
+			// One or More parameter is Invalid.
+		}
+		default: {break; }
+		}
+	}
+	else
+	{
+		// TSAPI Client has accepted the Request
+	}
+
+}
+
+/// <summary>
 /// This function helps in disconnecting established call.
 /// </summary>
 /// <param name="deviceID">Calling object will pass device ID of device where call has come in this variable.</param>
@@ -1511,12 +1566,14 @@ void TSAPIInterface::AgentMakeCall(DeviceID_t callingDevice, DeviceID_t calledDe
 {
 	m_nRetCode = cstaMakeCall(m_lAcsHandle	// handle returned by the acsOpenStream()
 		, (InvokeID_t)++m_ulInvokeID // application generated invokeID
-		, (DeviceID_t *)&callingDevice 
-		, (DeviceID_t *)&calledDevice 
+		//, (DeviceID_t *)&callingDevice 
+		//, (DeviceID_t *)&calledDevice 
+		, (DeviceID_t *)callingDevice
+		, (DeviceID_t *)calledDevice
 		, NULL); // private data is optional and is set as NULL here.
 
 	m_InvokeID2DeviceID[m_ulInvokeID] = callingDevice;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentDisconnectCall";
+	m_InvokeID2ActName[m_ulInvokeID] = "AgentMakeCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1736,14 +1793,20 @@ void TSAPIInterface::AgentDeflectCall(DeviceID_t deviceID, long activeCall, Devi
 void TSAPIInterface::AgentPickupCall(DeviceID_t deviceID, long activeCall, DeviceID_t calledDevice)//电话转移
 {
 	ConnectionID_t m_stConnectionID;
-	m_stConnectionID.devIDType = STATIC_ID;
-	strcpy((char *)&m_stConnectionID.deviceID, (char *)deviceID);
+	m_stConnectionID.devIDType = STATIC_ID;// DYNAMIC_ID;
+//	strcpy((char *)&m_stConnectionID.deviceID, (char *)deviceID);
+	lstrcpy(m_stConnectionID.deviceID, deviceID);
 	m_stConnectionID.callID = activeCall;
 
+
+	ConnectionID_t *connectionId = &m_stConnectionID;
+	DeviceID_t *newDevice;
+	newDevice = (DeviceID_t*)calledDevice;
+
 	m_nRetCode = cstaPickupCall(m_lAcsHandle	// handle returned by the acsOpenStream()
-		, (InvokeID_t)++m_ulInvokeID // application generated invokeID
-		, (ConnectionID_t *)&m_stConnectionID
-		, (DeviceID_t *)&calledDevice    //calledDevice
+		, ++m_ulInvokeID // application generated invokeID
+		, connectionId
+		, newDevice    //calledDevice
 		, NULL); // private data is optional and is set as NULL here.
 
 	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
@@ -1964,16 +2027,51 @@ void TSAPIInterface::StopMonitor(CSTAMonitorCrossRefID_t m_lMonitorCrossRefID)
 		default:{break;}
 		}
 	}
+	else {
+	
+	}
 }
 
-//Routing Service 
-void TSAPIInterface::RouteEndInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID)
-{
-	m_nRetCode = cstaRouteEndInv(m_lAcsHandle,		// handle returned by the acsOpenStream
+//This function get the device  information about calls associated with a given CSTA device
+void TSAPIInterface::SnapshotDevice(DeviceID_t deviceId) {
+	/* cstaSnapshotDeviceReq() - Service Request */
+	DeviceID_t *snapshotObj;
+	snapshotObj = (DeviceID_t*)deviceId;
+
+	m_nRetCode = cstaSnapshotDeviceReq(
+		m_lAcsHandle,
 		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
-		routeRegisterReqID,
-		routingCrossRefID,
-		GENERIC_UNSPECIFIED, //errorValue   INVALID_CSTA_DEVICE_IDENTIFIER / RESOURCE_BUSY / RESOURCE_OUT_OF_SERVICE 
+		snapshotObj,
+		NULL);
+
+	if (m_nRetCode < 0)
+	{
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// m_lAcsHandle is Invalid 
+		}break;
+		default: {break; }
+		}
+	}
+	else {
+
+	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = deviceId;//(int)atoi()
+	m_InvokeID2ActName[m_ulInvokeID] = "AgentSnapshotDevice";
+}
+
+//This function monitor the talking device 
+void TSAPIInterface::SingleStepConferenceCall(DeviceID_t deviceId) {
+	/* cstaSnapshotDeviceReq() - Service Request */
+	DeviceID_t *snapshotObj;
+	snapshotObj = (DeviceID_t*)deviceId;
+
+	m_nRetCode = cstaSnapshotDeviceReq(
+		m_lAcsHandle,
+		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
+		snapshotObj,
 		NULL); // private data is optional and is set as NULL here.
 
 
@@ -1988,79 +2086,29 @@ void TSAPIInterface::RouteEndInv(RouteRegisterReqID_t routeRegisterReqID, Routin
 		default: {break; }
 		}
 	}
+	else {
 
-}
-
-void TSAPIInterface::RouteRegister(DeviceID_t routingDevice)
-{
-	m_nRetCode = cstaRouteRegisterReq(m_lAcsHandle,	// handle returned by the acsOpenStream
-		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
-		(DeviceID_t *)routingDevice,
-		NULL); // private data is optional and is set as NULL here.
-
-
-	if (m_nRetCode < 0)
-	{
-		switch (m_nRetCode)
-		{
-		case ACSERR_BADHDL:
-		{
-			// m_lAcsHandle is Invalid 
-		}break;
-		default: {break; }
-		}
 	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = deviceId;//(int)atoi()
+	m_InvokeID2ActName[m_ulInvokeID] = "AgentSnapshotDevice";
 }
-
-void TSAPIInterface::RouteRegisterCancel(RouteRegisterReqID_t routeRegisterReqID)
+/*
+string TSAPIInterface::ReturnMes(string mes, ...)
 {
-	m_nRetCode = cstaRouteRegisterCancel(m_lAcsHandle,	// handle returned by the acsOpenStream
-		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
-		routeRegisterReqID,
-		NULL); // private data is optional and is set as NULL here.
+	Json::Value value;
+	Json::FastWriter writer;
 
-
-	if (m_nRetCode < 0)
+	va_list arg_ptr;
+	string nArgValue = mes;
+	va_start(arg_ptr, mes);  //以固定参数的地址为起点确定变参的内存起始地址。 
+	do
 	{
-		switch (m_nRetCode)
-		{
-		case ACSERR_BADHDL:
-		{
-			// m_lAcsHandle is Invalid 
-		}break;
-		default: {break; }
-		}
-	}
+		nArgValue = va_arg(arg_ptr, string);  //得到下一个可变参数的值 
+	} while (nArgValue != "end");
+	return;
 }
 
-void TSAPIInterface::RouteSelectInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID,
-	DeviceID_t routeSelected, RetryValue_t remainRetry
-	, SetUpValues_t setupInformation, Boolean routeUsedReq)
-{
-	m_nRetCode = cstaRouteSelectInv(m_lAcsHandle,	// handle returned by the acsOpenStream
-		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
-		routeRegisterReqID, 
-		routingCrossRefID,
-		(DeviceID_t*)routeSelected,
-		remainRetry,
-		&setupInformation,
-		routeUsedReq,
-		NULL); // private data is optional and is set as NULL here.
-
-
-	if (m_nRetCode < 0)
-	{
-		switch (m_nRetCode)
-		{
-		case ACSERR_BADHDL:
-		{
-			// m_lAcsHandle is Invalid 
-		}break;
-		default: {break; }
-		}
-	}
-
-}
+*/
 
 string TSAPIInterface::ReturnMes(map<string, string>mes)
 {

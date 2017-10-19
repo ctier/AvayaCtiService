@@ -84,6 +84,12 @@ void AvayaCallCenterUserAgent ::AgentAnswerCall(DeviceID_t m_szDeviceID,long m_c
 	m_pTsapiInterfaceObject->AgentAnswerCall(m_szDeviceID,m_callID);
 }
 
+//This function will be called when ClearConnection button is clicked
+void AvayaCallCenterUserAgent::AgentClearConnection(DeviceID_t m_szDeviceID, long m_callID)
+{
+	m_pTsapiInterfaceObject->AgentClearConnection(m_szDeviceID, m_callID);
+}
+
 void AvayaCallCenterUserAgent :: AgentDisconnectCall(DeviceID_t m_szDeviceID, long m_callID)
 {
 	m_pTsapiInterfaceObject->AgentDisconnectCall(m_szDeviceID,m_callID);
@@ -137,4 +143,13 @@ void AvayaCallCenterUserAgent::AgentConsultationCall(DeviceID_t deviceID, long a
 void AvayaCallCenterUserAgent::AgentReconnectCall(DeviceID_t deviceID, long heldCall, long activeCall)//从两方求助状态重连电话
 {
 	m_pTsapiInterfaceObject->AgentReconnectCall(deviceID, heldCall, activeCall);
+}
+//通话监听
+//snapshot get the callid
+//single step conference(slient)
+map<string, string> monitorDevice;
+void AvayaCallCenterUserAgent::AgentMonitorCall(DeviceID_t deviceID, DeviceID_t checkedDevice)//从两方求助状态重连电话
+{
+	//m_pTsapiInterfaceObject->AgentReconnectCall(deviceID, heldCall, activeCall);
+	m_pTsapiInterfaceObject->SnapshotDevice(checkedDevice);
 }

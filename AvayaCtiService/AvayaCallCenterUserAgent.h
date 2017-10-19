@@ -32,6 +32,7 @@ public:
 	void AgentGetState(DeviceID_t );
 	// This function is used to call method of TSAPIInterface class for Answering the call
 	void AgentAnswerCall(DeviceID_t,long);
+	void AgentClearConnection(DeviceID_t m_szDeviceID, long m_callID);
 	// This function is used to call method of TSAPIInterface class for Disconnecting the call
 	void AgentDisconnectCall(DeviceID_t, long);	// for Disconnecting the call
 
@@ -55,7 +56,12 @@ public:
 	void AgentConsultationCall(DeviceID_t D1, long C1, DeviceID_t D3);//两方求助电话
 	//This function is used to Reconnect the Call  
 	//activeCall (C2- D1)   heldCall (C1- D1)
-	void AgentReconnectCall(DeviceID_t D1, long C1, long C2);//从两方求助状态重连电话
+	void AgentReconnectCall(DeviceID_t D1, long C1, long C2);
+	//通话监听
+	//snapshot get the callid
+	//single step conference(slient)
+	void AgentMonitorCall(DeviceID_t deviceID, DeviceID_t checkedDevice);
+	//从两方求助状态重连电话
 
 	// This funcion is used to Query the Agent State
 	void QueryAgentStatus(DeviceID_t); // for polling Agent current status.

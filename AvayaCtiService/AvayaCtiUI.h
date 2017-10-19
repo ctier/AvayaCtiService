@@ -50,4 +50,21 @@ public:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedBegin();
 	CString m_message;
+	afx_msg void OnBnClickedLoginBtn();
+	int m_radioBtnGroup1;
+	afx_msg void OnBnClickedRadioBtnGroup1();
+	int m_radioBtnGroup2;
+	afx_msg void OnBnClickedRadioBtnGroup2();
+	afx_msg void OnBnClickedLogoutBtn();
+	afx_msg void OnBnClickedStateChangeBtn();
+	afx_msg void OnBnClickedChkstateBtn();
+	afx_msg void OnBnClickedCallBtn();
+	afx_msg void OnBnClickedMonitorStartBtn();
+	afx_msg void OnBnClickedMonitorStopBtn();
+	afx_msg void OnBnClickedAnswerBtn();
+	afx_msg void OnBnClickedClearconBtn();
+	afx_msg void OnBnClickedHoldBtn();
+	afx_msg void OnBnClickedCancelholdBtn();
+	afx_msg void OnBnClickedPickupBtn();
+	afx_msg void OnBnClickedMonitorcallbtn();
 };

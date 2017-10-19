@@ -90,6 +90,7 @@ public:
 	
 	// This function is used to Answer the Call
 	void AgentAnswerCall(DeviceID_t, long); // for Answering call
+	void AgentClearConnection(DeviceID_t deviceID, long callID);
 	// This function is used to Disconnect the Call
 	void AgentDisconnectCall(DeviceID_t, long);	// for Disconnect a call
 	//This function is used to Make the Call
@@ -125,6 +126,9 @@ public:
 	// This method is used to remove the monitor from the Station Extension
 	void StopMonitor(CSTAMonitorCrossRefID_t m_lMonitorCrossRefID);		// for removing the monitor
 
+	void SnapshotDevice(DeviceID_t deviceId);
+	void SingleStepConferenceCall(DeviceID_t deviceId);
+
 	//Routing Service   //CTI调用  不开放给Agent  //参数怎么用？默认？
 	void RouteEndInv(RouteRegisterReqID_t, RoutingCrossRefID_t);
 	void RouteRegisterCancel(RouteRegisterReqID_t);
@@ -154,6 +158,9 @@ private :
 	KafkaProducer* m_pProducerObject;
 	map<InvokeID_t, string> m_InvokeID2DeviceID;//绑定请求ID与请求设备ID
 	map<InvokeID_t, string> m_InvokeID2ActName;//绑定请求ID与操作名
+
+	map<string, string> m_DeviceCallID;//设备的CALLID
+
 
 	ACSHandle_t m_lAcsHandle;	// Handle for ACS Stream
 	RetCode_t m_nRetCode;			// code returned by the client library for success or failure of service request
