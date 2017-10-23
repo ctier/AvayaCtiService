@@ -30,6 +30,7 @@
 #define IDC_AGT_DRPCALL                 1020
 #define IDC_DeviceID_LB                 1020
 #define IDC_BUTTON4                     1021
+#define IDC_ROUTING_SELECT              1021
 #define IDC_OpenStream                  1022
 #define IDC_Begin                       1023
 #define IDC_CLEAR_BTN                   1025
@@ -87,9 +88,15 @@
 #define IDC_CALLID_EDIT5                1078
 #define IDC_PICKUP_BTN                  1079
 #define IDC_DeviceID_LB9                1080
+#define IDC_ROUTING_GRO                 1081
 #define IDC_DEVICE_EDIT9                1082
 #define IDC_DeviceID_LB10               1083
 #define IDC_DEVICE_EDIT10               1084
+#define IDC_BLAKLIST_LB                 1085
+#define IDC_ROUTING_EDIT1               1086
+#define IDC_ROUTING_INSERT              1088
+#define IDC_BUTTON3                     1089
+#define IDC_ROUTING_DELETE              1089
 
 // Next default values for new objects
 // 
@@ -97,7 +104,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        318
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1060
+#define _APS_NEXT_CONTROL_VALUE         1090
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

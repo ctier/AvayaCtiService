@@ -45,6 +45,7 @@ AvayaCtiUI::AvayaCtiUI(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_AvayaCti, pParent)
 	
 	, m_message(_T(""))
+	, m_strRouting(_T(""))
 {
 	m_pTSAPIInterface = NULL;
 	m_pAgtObject = NULL;
@@ -165,6 +166,7 @@ void AvayaCtiUI::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_VIEWSTATE, m_Status);
 
 	DDX_Text(pDX, IDC_MESSAGE, m_message);
+	DDX_Text(pDX, IDC_ROUTING_EDIT1, m_strRouting);
 }
 
 void AvayaCtiUI::MonitoringKafka()
@@ -340,6 +342,9 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 
 BEGIN_MESSAGE_MAP(AvayaCtiUI, CDialog)
 	ON_BN_CLICKED(IDC_Begin, &AvayaCtiUI::OnBnClickedBegin)
+	ON_BN_CLICKED(IDC_ROUTING_INSERT, &AvayaCtiUI::OnBnClickedRoutingInsert)
+	ON_BN_CLICKED(IDC_ROUTING_DELETE, &AvayaCtiUI::OnBnClickedRoutingDelete)
+	ON_BN_CLICKED(IDC_ROUTING_SELECT, &AvayaCtiUI::OnBnClickedRoutingSelect)
 END_MESSAGE_MAP()
 
 
@@ -353,5 +358,26 @@ void AvayaCtiUI::OnBnClickedBegin()
 	UpdateData(FALSE);
 
 	SelectTSAPIInterface(KafkaMessage);
+
+}
+
+
+void AvayaCtiUI::OnBnClickedRoutingInsert()
+{
+	UpdateData(TRUE);//m_strRouting
+	string sql_message = "INSERT INTO NUMBERLIST(number) VALUES ('";
+	sql_message += m_strRouting + "')";
+	
+}
+
+
+void AvayaCtiUI::OnBnClickedRoutingDelete()
+{
+
+}
+
+
+void AvayaCtiUI::OnBnClickedRoutingSelect()
+{
 
 }

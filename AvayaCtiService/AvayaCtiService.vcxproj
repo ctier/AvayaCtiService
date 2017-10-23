@@ -76,8 +76,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>.\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\inc;D:\Program Files %28x86%29\mysql-5.7.20-win32\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\lib;D:\Program Files %28x86%29\mysql-5.7.20-win32\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -101,7 +101,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>librdkafka.lib;librdkafkacpp.lib;csta32.lib;attprv32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmysql.lib;librdkafka.lib;librdkafkacpp.lib;csta32.lib;attprv32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -190,11 +190,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AgentStateObserver.h" />
+    <ClInclude Include="AvayaCallCenterRouting.h" />
     <ClInclude Include="AvayaCallCenterUserAgent.h" />
     <ClInclude Include="AvayaCtiService.h" />
     <ClInclude Include="AvayaCtiUI.h" />
-    <ClInclude Include="CallStateObserver.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="inc\Acs.h" />
     <ClInclude Include="inc\Acsdefs.h" />
@@ -217,17 +216,20 @@
     <ClInclude Include="inc\Tsplatfm.h" />
     <ClInclude Include="KafkaConsumer.h" />
     <ClInclude Include="KafkaProducer.h" />
+    <ClInclude Include="MySQLInterface.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TSAPIInterface.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AvayaCallCenterRouting.cpp" />
     <ClCompile Include="AvayaCallCenterUserAgent.cpp" />
     <ClCompile Include="AvayaCtiService.cpp" />
     <ClCompile Include="AvayaCtiUI.cpp" />
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="KafkaConsumer.cpp" />
     <ClCompile Include="KafkaProducer.cpp" />
+    <ClCompile Include="MySQLInterface.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

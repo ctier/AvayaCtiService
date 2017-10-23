@@ -33,12 +33,6 @@
     <ClInclude Include="AvayaCtiUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AgentStateObserver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CallStateObserver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Constant.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -111,6 +105,12 @@
     <ClInclude Include="inc\Tsplatfm.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="AvayaCallCenterRouting.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MySQLInterface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AvayaCtiService.cpp">
@@ -135,6 +135,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="jsoncpp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AvayaCallCenterRouting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MySQLInterface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

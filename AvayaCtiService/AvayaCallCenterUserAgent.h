@@ -6,7 +6,7 @@
 */
 
 #pragma once
-#include "AgentStateObserver.h"
+//#include "AgentStateObserver.h"
 #include "TSAPIInterface.h"
 #include "Cstadefs.h"
 
@@ -80,6 +80,8 @@ private:
 	CPtrArray m_pAgtObserver;
 	// This object will contain the TSAPIInterface Object
 	TSAPIInterface *m_pTsapiInterfaceObject;
+
+
 };
 
 

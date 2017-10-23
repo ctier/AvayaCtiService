@@ -48,12 +48,15 @@ private:
 	void InitializeDialog();
 public:
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnBnClickedBegin();
+
 	CString m_message;
-	afx_msg void OnBnClickedLoginBtn();
+	CString m_strRouting;
 	int m_radioBtnGroup1;
-	afx_msg void OnBnClickedRadioBtnGroup1();
 	int m_radioBtnGroup2;
+
+	afx_msg void OnBnClickedBegin();
+	afx_msg void OnBnClickedLoginBtn();
+	afx_msg void OnBnClickedRadioBtnGroup1();
 	afx_msg void OnBnClickedRadioBtnGroup2();
 	afx_msg void OnBnClickedLogoutBtn();
 	afx_msg void OnBnClickedStateChangeBtn();
@@ -67,4 +70,7 @@ public:
 	afx_msg void OnBnClickedCancelholdBtn();
 	afx_msg void OnBnClickedPickupBtn();
 	afx_msg void OnBnClickedMonitorcallbtn();
+	afx_msg void OnBnClickedRoutingInsert();
+	afx_msg void OnBnClickedRoutingDelete();
+	afx_msg void OnBnClickedRoutingSelect();
 };
