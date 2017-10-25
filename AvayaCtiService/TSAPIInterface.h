@@ -132,12 +132,8 @@ public:
 	//Routing Service   //CTI调用  不开放给Agent  //参数怎么用？默认？
 	void RouteEndInv(RouteRegisterReqID_t, RoutingCrossRefID_t);
 	void RouteRegisterCancel(RouteRegisterReqID_t);
-	void RouteRegister(DeviceID_t);
-	void RouteSelectInv(RouteRegisterReqID_t,RoutingCrossRefID_t, DeviceID_t, RetryValue_t, SetUpValues_t, Boolean);
-
-
-
-
+	void RouteRegister(DeviceID_t*);
+	void RouteSelectInv(RouteRegisterReqID_t,RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean);
 
 	~TSAPIInterface();
 

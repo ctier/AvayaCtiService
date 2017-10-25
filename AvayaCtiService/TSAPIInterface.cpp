@@ -170,23 +170,13 @@ void TSAPIInterface::HandleCSTARequest(CSTAEvent_t cstaEvent, ATTPrivateData_t p
 	{
 	case CSTA_ROUTE_REQUEST_EXT://请求呼叫相关的信息事件(TSAPI Version 2)
 	{
-		RouteRegisterReqID_t routeRegisterReqID;//路由服务的路由注册会话的句柄
-		RoutingCrossRefID_t routingCrossRefID;//路由会话的唯一句柄
-		CalledDeviceID_t currentRoute;//指定调用的目标
-		CallingDeviceID_t callingDevice;//指定调用起始设备
-		ConnectionID_t routedCall;//指定要路由的调用的 callID。 这是路由设备 connectionID 的路由调用。
-		SelectValue_t routedSelAlgorithm;//指示所请求的路由算法的类型。它被设置为 SV_NORMAL。
-		unsigned char priority;//指示调用的优先级
-		SetUpValues_t setupInformation;//包含 ISDN 呼叫设置消息
-		ATTEvent_t att_event;
-		if (attPrivateData((ATTPrivateData_t *)&privateData, &att_event) == ATT_ROUTE_REQUEST)
-		{
-			//att_event.u.routeRequest;
-		}
+		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteRequestExtEvent(cstaEvent.event.cstaRequest.u.routeRequestExt, privateData);
+		
 	}//end of CSTA_ROUTE_REQUEST_EXT
 	break;
 	case CSTA_ROUTE_REQUEST://请求呼叫相关的信息事件(TSAPI Version 1)
 	{
+		/*
 		RouteRegisterReqID_t routeRegisterReqID;
 		RoutingCrossRefID_t routingCrossRefID;
 		CalledDeviceID_t routeUsed;
@@ -194,7 +184,7 @@ void TSAPIInterface::HandleCSTARequest(CSTAEvent_t cstaEvent, ATTPrivateData_t p
 		unsigned char domain;
 
 		ATTEvent_t att_event;
-
+		*/
 
 	}//end of CSTA_ROUTE_REQUEST
 	break;
@@ -211,7 +201,7 @@ void TSAPIInterface::HandleCSTARequest(CSTAEvent_t cstaEvent, ATTPrivateData_t p
 /// <param name="privateData">PrivateData object that contain private data information.</param>
 void TSAPIInterface::HandleCSTAEventReport(CSTAEvent_t cstaEvent, ATTPrivateData_t privateData)
 {
-	map<string, string> mes;//装标签key 和对应信息value
+	map<string, string> mes;
 	string res;
 
 	//信息不发送前端 只保存到数据库,发送到监控
@@ -2092,24 +2082,127 @@ void TSAPIInterface::SingleStepConferenceCall(DeviceID_t deviceId) {
 	m_InvokeID2DeviceID[m_ulInvokeID] = deviceId;//(int)atoi()
 	m_InvokeID2ActName[m_ulInvokeID] = "AgentSnapshotDevice";
 }
-/*
-string TSAPIInterface::ReturnMes(string mes, ...)
+//Routing Service 
+void TSAPIInterface::RouteEndInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID)
 {
-	Json::Value value;
-	Json::FastWriter writer;
+	//CSTAUniversalFailure_t    errorValue;
 
-	va_list arg_ptr;
-	string nArgValue = mes;
-	va_start(arg_ptr, mes);  //以固定参数的地址为起点确定变参的内存起始地址。 
-	do
+	m_nRetCode = cstaRouteEndInv(
+		m_lAcsHandle,
+		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
+		routeRegisterReqID,//
+		routingCrossRefID,//This is the routing dialog that the application is terminating.
+		GENERIC_UNSPECIFIED,//errorValue,
+		NULL);// private data is optional and is set as NULL here.
+
+
+	if (m_nRetCode < 0)
 	{
-		nArgValue = va_arg(arg_ptr, string);  //得到下一个可变参数的值 
-	} while (nArgValue != "end");
-	return;
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// m_lAcsHandle is Invalid 
+		}break;
+		default: {break; }
+		}
+	}
+	else {
+
+	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = routingCrossRefID;//terminating 
+	m_InvokeID2ActName[m_ulInvokeID] = "RouteEndInv";
 }
 
-*/
+void TSAPIInterface::RouteRegisterCancel(RouteRegisterReqID_t routeRegisterReqID)
+{
+	m_nRetCode = cstaRouteRegisterCancel(
+		m_lAcsHandle,
+		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
+		routeRegisterReqID,
+		NULL);// private data is optional and is set as NULL here.
+	if (m_nRetCode < 0)
+	{
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// m_lAcsHandle is Invalid 
+		}break;
+		default: {break; }
+		}
+	}
+	else {
 
+	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = routeRegisterReqID; 
+	m_InvokeID2ActName[m_ulInvokeID] = "RouteRegisterCancel";
+}
+
+
+void TSAPIInterface::RouteRegister(DeviceID_t * routingDevice)
+{
+
+	m_nRetCode = cstaRouteRegisterReq(
+		m_lAcsHandle,
+		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
+		routingDevice,
+		NULL);// private data is optional and is set as NULL here.
+
+
+	if (m_nRetCode < 0)
+	{
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// m_lAcsHandle is Invalid 
+		}break;
+		default: {break; }
+		}
+	}
+	else {
+
+	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = *routingDevice; 
+	m_InvokeID2ActName[m_ulInvokeID] = "RouteRegister";
+}
+
+void TSAPIInterface::RouteSelectInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID, 
+	DeviceID_t *routeSelected, RetryValue_t remainRetry, SetUpValues_t *setupInformation, Boolean routeUsedReq)
+{
+	m_nRetCode = cstaRouteSelectInv(
+		m_lAcsHandle,
+		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
+		routeRegisterReqID,//包含应用程序提供路由服务的路由注册会话的句柄。 路由服务器应用程序在 cstaRouteRegisterReq () 请求的 CSTARouteRegister ReqConfEvent 确认中接收到此句柄。
+		routingCrossRefID,//包含此调用的路由会话的句柄。应用程序以前在调用的 CSTARoute-RequestExtEvent 中接收到此句柄。
+		routeSelected, //指定调用的目标。
+		remainRetry,//指定当交换机需要请求备用路由时, 应用程序愿意接收此调用的 CSTARouteRequestExtEvent 的次数。
+		setupInformation,//包含一个已修改的 ISDN 呼叫设置消息, 交换机将使用它来路由呼叫。
+		routeUsedReq,//指示接收 CSTARoute UsedExtEvent 的请求。
+		NULL);// private data is optional and is set as NULL here.
+
+
+	if (m_nRetCode < 0)
+	{
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// m_lAcsHandle is Invalid 
+		}break;
+		default: {break; }
+		}
+	}
+	else {
+
+	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = *routeSelected;
+	m_InvokeID2ActName[m_ulInvokeID] = "RouteSelectInv";
+}
+
+
+////
 string TSAPIInterface::ReturnMes(map<string, string>mes)
 {
 	Json::Value value;

@@ -1,36 +1,44 @@
 #ifndef __AVAYACALLCENTERROUTING_H__  
 #define __AVAYACALLCENTERROUTING_H__
-#include <Windows.h>
-#include <mysql.h>
 #include <string>
 #include <vector>
 #include <iostream>
 #include "MySQLInterface.h"
+#include "TSAPIInterface.h"
 
 using namespace std;
 class AvayaCallCenterRouting
 {
 private:
-	const char *user;
-	const char *pswd;
-	const char *host;
-	const char *table;
-	int port;
-	MYSQL myCont;
-	MYSQL_RES *result;  //数据集
-	MYSQL_ROW sql_row;  //行数据的类型安全表示   当前实现位一个计数字节的字符串数组
-	MYSQL_FIELD *sql_field; //列相关属性
-	int res;
-	//string query;
-	MySQLInterface mysql;
+	// This object will contain the MySQLInterface Object
+	MySQLInterface *m_pMySQLInterface;
+	// This object will contain the TSAPIInterface Object
+	TSAPIInterface *m_pTsapiInterfaceObject;
+
+	//vector<string> selectline;
+	//string Querystr;
+
 	bool init();
 public:
-	AvayaCallCenterRouting(const char *user, const char *pswd, const char *host, const char *table, int port);
+	AvayaCallCenterRouting();
 	virtual ~AvayaCallCenterRouting();
 
-	bool Insert(string mes);
-	bool Delete(string mes);
-	bool Updata(string mes);
-	string Select(string mes);
+	//Using MySQL Database NUMBERLIST
+	string InsertNumber(const char *telephonenumber, const char *type);//const string& Querystr
+	string DeleteNumber(const char *telephonenumber);
+	string UpdataNumber(const char *telephonenumber, const char *type);
+	string SelectNumber(const char *telephonenumber, vector<string>& data);
+	//Routing Service Group Function
+	void RouteRegister(DeviceID_t*);	//A NULL device identifier indicates that the requesting application will be the default routing server for Communication Manager.
+
+	void RouteEndInv(RouteRegisterReqID_t, RoutingCrossRefID_t);
+	void RouteRegisterCancel(RouteRegisterReqID_t);
+	void RouteSelectInv(RouteRegisterReqID_t, RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean);
+	//Routing Service Group Event
+	//map<string, string>
+	void RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData);
+	void RouteEndEvent(CSTARouteEndEvent_t routeEnd);
+	void RouteRegisterAbortEvent(CSTARouteRegisterAbortEvent_t registerAbort);
+	void RouteUsedExtEvent(CSTARouteUsedExtEvent_t routeUsedExt);
 };
 #endif

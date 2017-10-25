@@ -28,7 +28,7 @@ typedef struct
 	int port;
 }MySQLConInfo;
 
-class MySQLInterface
+class MySQLInterface : public CWnd
 {
 public:
 	MySQLInterface();
@@ -49,15 +49,19 @@ public:
 
 	string ErrorIntoMySQL();     // 错误消息  
 
+	static MySQLInterface *GetInstance();	// This allows to create only a single Object for the MySQLInterface class
+
 public:
 	int ErrorNum;                // 错误代号    
 	const char* ErrorInfo;       //	错误提示    
+
+protected:
+	static MySQLInterface *m_pSelf;
 
 private:
 	MySQLConInfo MysqlConInfo;   // 连接信息  
 	MYSQL MysqlInstance;         // MySQL对象  
 	MYSQL_RES *Result;           // 用于存放结果 数据集
-	MYSQL_FIELD *Field;			 // 用于存放列相关属性
 };
 
 #endif   

@@ -16,6 +16,26 @@ MySQLInterface::~MySQLInterface()
 {
 }
 
+//////////////////////////////////////////////////////////
+MySQLInterface * MySQLInterface::m_pSelf = NULL;
+
+// Creating a Single object of the class
+// Returns one and only instance of this class
+MySQLInterface* MySQLInterface::GetInstance()
+{
+	if (m_pSelf == NULL)
+	{
+		m_pSelf = new MySQLInterface();
+		if (m_pSelf != NULL)
+		{
+			// memory has been allocated.
+			m_pSelf->CreateEx(0, AfxRegisterWndClass(CS_GLOBALCLASS), "", 0, 0, 0, 0, 0, 0, 0);
+		}
+	}
+	return m_pSelf;
+}
+
+
 // 设置连接信息
 void MySQLInterface::SetMySQLConInfo(char* server, char* username, char* password, char* database, int port)
 {
@@ -69,7 +89,6 @@ string MySQLInterface::Select(const std::string& Querystr, std::vector<std::vect
 	MYSQL_ROW line = NULL;
 	line = mysql_fetch_row(Result);
 
-	int j = 0;
 	string temp;
 	vector<vector<string> >().swap(data);
 	if (Result)
@@ -96,12 +115,12 @@ string MySQLInterface::Select(const std::string& Querystr, std::vector<std::vect
 	}
 	else
 	{
-		string res = "Select Successful.Target don't exist!";
+		res = "Select Successful.Target don't exist!";
 	}
 	
 	return res;
 }
-
+//读取数据列表 一行/多行？
 string MySQLInterface::SelectList(const string& Querystr, vector<string>& data)
 {
 	string res = "SelectList Successful.";
@@ -110,26 +129,91 @@ string MySQLInterface::SelectList(const string& Querystr, vector<string>& data)
 		return ErrorIntoMySQL();
 	}
 
+	MYSQL_FIELD *Field;
+	vector<string>().swap(data);
+	string temp;
 	Result = mysql_store_result(&MysqlInstance);
 
+	if (Result)
+	{
+		unsigned int num_fields = mysql_num_fields(Result);
+		Field = mysql_fetch_fields(Result);
+		for (unsigned int i = 0; i < num_fields; i++)
+		{
+			temp = Field[i].name;
+			data.push_back(temp);
+		}
+	}
+	else
+	{
+		res = "Select Successful.Target don't exist!";
+	}
+	return res;
 }
+// 读取一行数据
+string MySQLInterface::SelectOneLine(const string& Querystr, vector<string>& data)
+{
+	string res = "Select Successful.";
+	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
+	{
+		return ErrorIntoMySQL();
+	}
 
+	Result = mysql_store_result(&MysqlInstance);
+
+	// 行列数
+	int row = mysql_num_rows(Result);//行
+	int field = mysql_num_fields(Result);//列
+
+	MYSQL_ROW line = NULL;
+	line = mysql_fetch_row(Result);
+
+	string temp;
+	vector<string>().swap(data);
+
+	if (Result)
+	{
+		if (row != 1)
+		{
+			res = "Select Successful.There are more than one line.";
+			return res;
+		}
+		for (int i = 0; i < field; i++)
+		{
+			if (line[i])
+			{
+				temp = line[i];
+				data.push_back(temp);
+			}
+			else
+			{
+				temp = "";
+				data.push_back(temp);
+			}
+		}
+	}
+	else
+	{
+		res = "Select Successful.Target don't exist!";
+	}
+
+	return res;
+}
 // 其他操作
 string MySQLInterface::Query(const std::string& Querystr)
 {
 	string res = "Query Successful.";
 	if (mysql_real_query(&MysqlInstance, Querystr.c_str(),(unsigned int)Querystr.size()))
-	{
-		return res;
-	}
-	return ErrorIntoMySQL();
+		return ErrorIntoMySQL();
+	return res;
+
 }
 
 string MySQLInterface::Insert(const string& Querystr)
 {
 	string res = "Insert Successful.";
 	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
-		return mysql_error(&MysqlInstance);
+		return ErrorIntoMySQL();
 	return res;
 }
 
@@ -137,7 +221,7 @@ string MySQLInterface::Delete(const string& Querystr)
 {
 	string res = "Delete Successful.";
 	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
-		return mysql_error(&MysqlInstance);
+		return ErrorIntoMySQL();
 	return res;
 }
 
@@ -145,14 +229,14 @@ string MySQLInterface::Updata(const string& Querystr)
 {
 	string res = "Updata Successful.";
 	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
-		return mysql_error(&MysqlInstance);
+		return ErrorIntoMySQL();
 	return res;
 }
 
 //错误信息
 string MySQLInterface::ErrorIntoMySQL()
 {
-	ErrorNum = mysql_errno(&MysqlInstance);
+	ErrorNum = mysql_errno(&MysqlInstance);//未返回 是否需要ErrorNum接口 ？
 	ErrorInfo = mysql_error(&MysqlInstance);
 	string res = ErrorInfo;
 	return res;

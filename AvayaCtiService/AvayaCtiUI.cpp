@@ -71,15 +71,15 @@ BOOL AvayaCtiUI::OnInitDialog()
 	{
 		return FALSE;
 	}
-	/*
-	//创建CallManager对象
-	m_pCallManagerObject = new CallManager;
+	
+	//创建AvayaCallCenterRouting对象
+	m_pRoutingObject = new AvayaCallCenterRouting();
 
-	if (m_pCallManagerObject == NULL)
+	if (m_pRoutingObject == NULL)
 	{
 		return FALSE;
 	}
-	*/
+	
 	HINSTANCE hInst = AfxGetInstanceHandle();
 	char szFileName[MAX_PATH];
 	GetModuleFileName(hInst, szFileName, MAX_PATH);
@@ -212,7 +212,7 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 	}
 	string method = receive_message["method"];
 	switch (hash_(method.c_str())) {
-	//可以再封一层
+
 	//Set Feature Service Group
 	case "AgentLogin"_hash:
 	{
@@ -308,7 +308,8 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 		m_pAgtObject->AgentReconnectCall(&receive_message["DeviceID"][0], stoi(receive_message["heldCall"]), stoi(receive_message["activeCall"]));
 		break;
 	}
-	//Routing Service
+	//Routing Service  不开放给客户端
+	/*
 	case "RouteEnd"_hash://
 	{
 		break;
@@ -329,6 +330,7 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 	{
 		break;
 	}
+	*/
 	//
 	default:
 	{
@@ -365,8 +367,6 @@ void AvayaCtiUI::OnBnClickedBegin()
 void AvayaCtiUI::OnBnClickedRoutingInsert()
 {
 	UpdateData(TRUE);//m_strRouting
-	string sql_message = "INSERT INTO NUMBERLIST(number) VALUES ('";
-	sql_message += m_strRouting + "')";
 	
 }
 

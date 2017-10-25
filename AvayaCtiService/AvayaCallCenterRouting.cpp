@@ -2,126 +2,107 @@
 #include "AvayaCallCenterRouting.h"
 #include "AvayaCtiService.h"
 
-AvayaCallCenterRouting::AvayaCallCenterRouting(
-	const char *user, const char *pswd, const char *host,
-	const char *table, int port)
-	:user(user), pswd(pswd), host(host),
-	table(table),port(port)
+AvayaCallCenterRouting::AvayaCallCenterRouting()
 {
 	init();
 }
 bool AvayaCallCenterRouting::init()
 {
-	mysql_init(&myCont);
-	if (!mysql_real_connect(&myCont, host, user, pswd, table, port, NULL, 0))
-	{
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Error connecting to database:" + mysql_error(&myCont) + "\r\n";
-		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
-		return false;
-	}
-	else
-	{
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Connected..." + "\r\n";
-		char *query = "SET CHARACTER SET utf8";//设置编码
-		res = mysql_real_query(&myCont, query, (unsigned int)strlen(query));
-		if (res)
-		{
-			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Encoding settings failed" + "\r\n";
-		}
-		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+	//创建MySQLInterface对象
+	m_pMySQLInterface = MySQLInterface::GetInstance();
 
-		return true;
-	}
+	char* server = "localhost";
+	char* username = "root";
+	char* password = "9201"; 
+	char* database = "ctidb"; 
+	int port = 3306;
+	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
+	// get the TSAPIInterface Object
+	m_pTsapiInterfaceObject = TSAPIInterface::GetInstance();
+	return true;
 }
 
 AvayaCallCenterRouting::~AvayaCallCenterRouting()
 {
-	if (result != NULL)
-		mysql_free_result(result);
-	mysql_close(&myCont);
+	m_pMySQLInterface->Close();
+	delete m_pMySQLInterface;
 }
 
-bool AvayaCallCenterRouting::Insert(string mes)
+
+void AvayaCallCenterRouting::RouteEndInv(RouteRegisterReqID_t RouteRegisterReqID, RoutingCrossRefID_t RoutingCrossRefID)
 {
-	bool ret = false;
-	res = mysql_real_query(&myCont, mes.c_str(), (unsigned int)mes.size());
-	if (res)
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Error inserting data to database:" + mysql_error(&myCont) + "\r\n";
-	else
-	{
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Insert Successful:" + mes.c_str() + "\r\n";
-		ret = true;
-	}
-	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
-	return ret;
+	m_pTsapiInterfaceObject->RouteEndInv(RouteRegisterReqID, RoutingCrossRefID);
 }
 
-bool AvayaCallCenterRouting::Delete(string mes)//先确定有删除目标
+void AvayaCallCenterRouting::RouteRegisterCancel(RouteRegisterReqID_t RouteRegisterReqID)
 {
-	bool ret = false;
-	res = mysql_real_query(&myCont, mes.c_str(), (unsigned int)mes.size());
-	if (res)
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Error deleting database data:" + mysql_error(&myCont) + "\r\n";
-	else
-	{
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Delete Successful:" + mes.c_str() + "\r\n";
-		ret = true;
-	}
-	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
-	return ret;
+	m_pTsapiInterfaceObject->RouteRegisterCancel(RouteRegisterReqID);
 }
 
-bool AvayaCallCenterRouting::Updata(string mes)//确定有更新目标
+void AvayaCallCenterRouting::RouteRegister(DeviceID_t* routingDevice)
 {
-	bool ret = false;
-	res = mysql_real_query(&myCont, mes.c_str(), (unsigned int)mes.size());
-	if (res)
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Error updating database data:" + mysql_error(&myCont) + "\r\n";
-	else
-	{
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Updata Successful:" + mes.c_str() + "\r\n";
-		ret = true;
-	}
-	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
-	return ret;
+	m_pTsapiInterfaceObject->RouteRegister(routingDevice);
 }
 
-string AvayaCallCenterRouting::Select(string mes)
+void AvayaCallCenterRouting::RouteSelectInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID,
+	DeviceID_t *routeSelected, RetryValue_t remainRetry, SetUpValues_t *setupInformation, Boolean routeUsedReq)
 {
-	string ret;
-	res = mysql_real_query(&myCont, mes.c_str(), (unsigned int)mes.size());
-	if (res)
-	{
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + "Error selecting database data:" + mysql_error(&myCont) + "\r\n";
-		ret = "error:";
-		ret += mysql_error(&myCont);
-	}
-	else
-	{	//select request succeeded
-		result = mysql_store_result(&myCont);
-		if (result)
-		{   //target is in the database
-			sql_row = mysql_fetch_row(result);//获取具体的数据,查找的number键设为UQ,只取一行值
-			ret = "ID:";
-			ret += sql_row[0];
-			ret += ";number:";
-			ret += sql_row[1];
-			if (sql_row[2])
-			{
-				ret += ";details:";
-				ret += sql_row[2];
-			}
-			else{}//没写details
-		}
-		else
-		{
-			ret = "target don't exist!";
-		}
-	}
-	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + ret.c_str() + "\r\n";
-	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+	m_pTsapiInterfaceObject->RouteSelectInv(routeRegisterReqID, routingCrossRefID,
+		routeSelected, remainRetry, setupInformation, routeUsedReq);
+}
 
-	result = mysql_store_result(&myCont);
-	
-	return ret;
+string AvayaCallCenterRouting::InsertNumber(const char *telephonenumber,const char *type)
+{
+	//,'ADDTIME'
+	string Query = "INSERT INTO NUMBERLIST('NUMBER','TYPE') VALUES('";
+	Query += telephonenumber;
+	Query += "','";
+	Query += type;
+	Query += "')";
+	return m_pMySQLInterface->Insert(Query);
+}
+
+string AvayaCallCenterRouting::DeleteNumber(const char *telephonenumber)
+{
+	string Query = "DELETE FROM NUMBERLIST WHERE NUMBER = '";
+	Query += telephonenumber;
+	Query += "'";
+	return m_pMySQLInterface->Delete(Query);
+}
+
+string AvayaCallCenterRouting::UpdataNumber(const char *telephonenumber, const char *type)
+{
+	string Query = "UPDATE NUMBERLIST SET TYPE = '";
+	Query += type;
+	Query += "' WHERE NUMBER = '";
+	Query += telephonenumber;
+	Query += "'";
+	return m_pMySQLInterface->Updata(Query);
+}
+
+string AvayaCallCenterRouting::SelectNumber(const char *telephonenumber, vector<string>& data)
+{
+	string Query = "SELECT * FROM NUMBERLIST WHERE NUMBER = '";
+	Query += telephonenumber;
+	Query += "'";
+	return m_pMySQLInterface->SelectOneLine(Query, data);
+}
+
+void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData)
+{
+	RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
+	RoutingCrossRefID_t routingCrossRefID = routeRequestExt.routingCrossRefID;//路由会话的唯一句柄
+	CalledDeviceID_t currentRoute = routeRequestExt.currentRoute;//指定调用的目标
+	CallingDeviceID_t callingDevice = routeRequestExt.callingDevice;//指定调用起始设备
+	ConnectionID_t routedCall = routeRequestExt.routedCall;//指定要路由的调用的 callID。 这是路由设备 connectionID 的路由调用。
+	SelectValue_t routedSelAlgorithm = routeRequestExt.routedSelAlgorithm;//指示所请求的路由算法的类型。它被设置为 SV_NORMAL。
+	unsigned char priority = routeRequestExt.priority;//指示调用的优先级
+	SetUpValues_t setupInformation = routeRequestExt.setupInformation;//包含 ISDN 呼叫设置消息
+
+	ATTEvent_t att_event;
+
+	if (attPrivateData((ATTPrivateData_t *)&privateData, &att_event) == ATT_ROUTE_REQUEST)
+	{
+		//att_event.u.routeRequest;
+	}
 }

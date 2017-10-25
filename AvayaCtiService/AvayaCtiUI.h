@@ -2,6 +2,7 @@
 #include "TSAPIInterface.h"
 //#include "CallManager.h"
 #include "AvayaCallCenterUserAgent.h"
+#include "AvayaCallCenterRouting.h"
 #include "KafkaConsumer.h"
 #include "rdkafkacpp.h"
 #include "afxwin.h"
@@ -31,6 +32,7 @@ protected:
 
 public:
 	AvayaCallCenterUserAgent *m_pAgtObject;  // object of Agent Class
+	AvayaCallCenterRouting *m_pRoutingObject;// object of Routing Class
 	//CallManager *m_pCallManagerObject;	 // object of CallManager Class
 	TSAPIInterface* m_pTSAPIInterface;		 // Handle for handling all events
 
