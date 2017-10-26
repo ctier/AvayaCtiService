@@ -17,12 +17,14 @@ private:
 
 	//vector<string> selectline;
 	//string Querystr;
-	RouteRegisterReqID_t routeRegisterReqID;
 
 	bool init();
 public:
 	AvayaCallCenterRouting();
 	virtual ~AvayaCallCenterRouting();
+
+	RouteRegisterReqID_t routeRegisterReqID;//save route Register Request ID 
+
 
 	//Using MySQL Database NUMBERLIST
 	string InsertNumber(const char *telephonenumber, const char *type);//const string& Querystr

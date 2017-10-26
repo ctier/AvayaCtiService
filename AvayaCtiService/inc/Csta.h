@@ -1,5 +1,8 @@
+/* vi/vim directives (for compatibility with Visual Studio editing) */
+/* ex: set tabstop=4: */
+
 /***********************************************************/
-/* Copyright (C) 2001 Avaya Inc.  All rights reserved.*/
+/* Copyright (C) 2008 Avaya Inc.  All rights reserved.     */
 /***********************************************************/
 /*
  *  csta.h    CSTA Events Defines
@@ -34,13 +37,13 @@
 
 #define CSTA_MAX_GET_DEVICE	20	/* Maximum number of devices
 								 * a CSTAGetDevice call can
-								 * return 
+								 * return
 								 */
 
-typedef struct 
+typedef struct
 {
 	InvokeID_t	invokeID;
-	union 
+	union
 	{
 		CSTARouteRequestEvent_t		routeRequest;
 		CSTARouteRequestExtEvent_t	routeRequestExt;
@@ -64,10 +67,10 @@ typedef struct
 	}u;
 } CSTAEventReport;
 
-typedef struct 
+typedef struct
 {
 	CSTAMonitorCrossRefID_t		monitorCrossRefId;
-	union 
+	union
 	{
 		CSTACallClearedEvent_t			callCleared;
 		CSTAConferencedEvent_t			conferenced;
@@ -101,10 +104,10 @@ typedef struct
 
 } CSTAUnsolicitedEvent;
 
-typedef struct 
+typedef struct
 {
 	InvokeID_t	invokeID;
-	union 
+	union
 	{
 		CSTAAlternateCallConfEvent_t		alternateCall;
 		CSTAAnswerCallConfEvent_t			answerCall;
@@ -148,7 +151,7 @@ typedef struct
 		CSTAGetAPICapsConfEvent_t			getAPICaps;
 		CSTAGetDeviceListConfEvent_t		getDeviceList;
 		CSTAQueryCallMonitorConfEvent_t		queryCallMonitor;
-		
+
 	} u;
 
 } CSTAConfirmationEvent;
@@ -156,10 +159,10 @@ typedef struct
 #define CSTA_MAX_HEAP	1024
 
 
-typedef struct 
+typedef struct
 {
 	ACSEventHeader_t	eventHeader;
-	union 
+	union
 	{
 		ACSUnsolicitedEvent		acsUnsolicited;
 		ACSConfirmationEvent	acsConfirmation;
@@ -177,7 +180,12 @@ typedef struct
 #ifdef __cplusplus
 extern "C"
 {
-#endif  
+#endif
+
+/* Utility functions */
+
+const char *
+cstaErrorString(CSTAUniversalFailure_t error);
 
 /* Basic Call Control Services */
 
@@ -459,7 +467,7 @@ cstaRouteRegisterCancel (	ACSHandle_t					acsHandle,
 							CONST_PARAM PrivateData_t	FAR	*privateData);
 
 	/* Release 1 calls, w/o invokeID, for backward compatibility */
-	
+
 TSAPI
 cstaRouteSelect (	ACSHandle_t						acsHandle,
 					RouteRegisterReqID_t			routeRegisterReqID,
@@ -480,7 +488,7 @@ cstaRouteEnd (	ACSHandle_t						acsHandle,
 
 
 	/* Release 2 calls, with invokeID */
-	
+
 TSAPI
 cstaRouteSelectInv (ACSHandle_t						acsHandle,
 					InvokeID_t						invokeID,
@@ -565,22 +573,22 @@ cstaSysStatEvent (	ACSHandle_t						acsHandle,
 
 TSAPI
 cstaGetAPICaps (ACSHandle_t acsHandle, InvokeID_t invokeID);
- 
- 
+
+
 TSAPI
 cstaGetDeviceList (	ACSHandle_t	acsHandle,
 					InvokeID_t	invokeID,
 				    long		index,
 				    CSTALevel_t	level);
 
-					
+
 TSAPI
 cstaQueryCallMonitor (ACSHandle_t acsHandle, InvokeID_t invokeID);
 
 
 #ifdef __cplusplus
 }
-#endif  
+#endif
 
 
 #endif

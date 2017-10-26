@@ -1,6 +1,8 @@
+/* vi/vim directives (for compatibility with Visual Studio editing) */
+/* ex: set tabstop=4: */
 
 /***********************************************************/
-/* Copyright (C) 2001 Avaya Inc.  All rights reserved.*/
+/* Copyright (C) 2001-2008 Avaya Inc.  All rights reserved.*/
 /***********************************************************/
 /*
  *  acslimit.h    ACS size limits

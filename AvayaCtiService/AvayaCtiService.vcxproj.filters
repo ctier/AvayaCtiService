@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{023a02f9-fc05-4941-847d-c1b4b3c57e67}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -48,67 +45,13 @@
     <ClInclude Include="KafkaProducer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Acs.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Acsdefs.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Acslimit.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Attpdefs.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Attpriv.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Cdi.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Csta.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Cstadefs.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\drvrdefs.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Insttsdr.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\json.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\json-forwards.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\rdkafka.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\rdkafkacpp.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Sdb.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\sdbdefs.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Tdi.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Tdrvr.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Tsplatfm.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="AvayaCallCenterRouting.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MySQLInterface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusRecord.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -141,6 +84,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MySQLInterface.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusRecord.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

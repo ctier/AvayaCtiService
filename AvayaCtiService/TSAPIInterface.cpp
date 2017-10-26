@@ -2199,6 +2199,35 @@ void TSAPIInterface::SingleStepTransferCall(DeviceID_t calledDevice, DeviceID_t 
 	}
 }
 
+void TSAPIInterface::RouteEndInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID)
+{
+	m_nRetCode = cstaRouteEndInv(
+		m_lAcsHandle,
+		(InvokeID_t)++m_ulInvokeID, // application generated invokeID
+		routeRegisterReqID,//
+		routingCrossRefID,//This is the routing dialog that the application is terminating.
+		(CSTAUniversalFailure_t)GENERIC_UNSPECIFIED,//errorValue,
+		NULL);// private data is optional and is set as NULL here.
+
+
+	if (m_nRetCode < 0)
+	{
+		switch (m_nRetCode)
+		{
+		case ACSERR_BADHDL:
+		{
+			// m_lAcsHandle is Invalid 
+		}break;
+		default: {break; }
+		}
+	}
+	else {
+
+	}
+	m_InvokeID2DeviceID[m_ulInvokeID] = routingCrossRefID;//terminating 
+	m_InvokeID2ActName[m_ulInvokeID] = "RouteEndInv";
+}
+
 void TSAPIInterface::RouteRegisterCancel(RouteRegisterReqID_t routeRegisterReqID)
 {
 	m_nRetCode = cstaRouteRegisterCancel(

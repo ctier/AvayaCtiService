@@ -1,299 +1,173 @@
-/***********************************************************/
-/* Copyright (C) 2001 Avaya Inc.  All rights reserved.*/
-/***********************************************************/
-/* abstract syntax: acs_asn_tbl */
-/* last module in input: ACS-authentication-services-2 */
-/* created: Fri Aug  1 10:06:37 1997 */
-/* associated control file: acsdefs.c */
+/* Copyright (C) 2004-2010 Avaya Inc. All Rights reserved */
 
 #ifndef ACSDEFS_H
 #define ACSDEFS_H
 
 #include "tsplatfm.h"
+#include <ctiacsdefs.h>
 
+#define ACS_OPEN_STREAM 		1
+#define ACS_OPEN_STREAM_CONF		2
+#define ACS_CLOSE_STREAM		3
+#define ACS_CLOSE_STREAM_CONF		4
+#define ACS_ABORT_STREAM		5
+#define ACS_UNIVERSAL_FAILURE_CONF	6
+#define ACS_UNIVERSAL_FAILURE		7
+#define ACS_KEY_REQUEST			8
+#define ACS_KEY_REPLY			9
+#define ACS_NAME_SRV_REQUEST		10
+#define ACS_NAME_SRV_REPLY		11
+#define ACS_AUTH_REPLY			12
+#define ACS_AUTH_REPLY_TWO		13
+#define ACS_SET_HEARTBEAT_INTERVAL	14
+#define ACS_SET_HEARTBEAT_INTERVAL_CONF	15
+#define ACS_CLIENT_HEARTBEAT		16
 
-#define          ACS_OPEN_STREAM 1
-#define          ACS_OPEN_STREAM_CONF 2
-#define          ACS_CLOSE_STREAM 3
-#define          ACS_CLOSE_STREAM_CONF 4
-#define          ACS_ABORT_STREAM 5
-#define          ACS_UNIVERSAL_FAILURE_CONF 6
-#define          ACS_UNIVERSAL_FAILURE 7
-#define          ACS_KEY_REQUEST 8
-#define          ACS_KEY_REPLY 9
-#define          ACS_NAME_SRV_REQUEST 10
-#define          ACS_NAME_SRV_REPLY 11
-#define          ACS_AUTH_REPLY 12
-#define          ACS_AUTH_REPLY_TWO 13
-
-typedef enum StreamType_t {
-    ST_CSTA = 1,
-    ST_OAM = 2,
-    ST_DIRECTORY = 3,
-    ST_NMSRV = 4
-} StreamType_t;
-
-typedef char            ServerID_t[49];
-
-typedef char            LoginID_t[49];
-
-typedef struct CryptPasswd_t {
-    short           length;
-    unsigned char   value[47];
-} CryptPasswd_t;
-
-typedef char            AppName_t[21];
-
-typedef enum Level_t {
-    ACS_LEVEL1 = 1,
-    ACS_LEVEL2 = 2,
-    ACS_LEVEL3 = 3,
-    ACS_LEVEL4 = 4
-} Level_t;
-
-typedef char            Version_t[21];
-
-typedef struct ACSOpenStream_t {
-    StreamType_t    streamType;
-    ServerID_t      serverID;
-    LoginID_t       loginID;
-    CryptPasswd_t   cryptPass;
-    AppName_t       applicationName;
-    Level_t         level;
-    Version_t       apiVer;
-    Version_t       libVer;
-    Version_t       tsrvVer;
-} ACSOpenStream_t;
-
-typedef struct ACSOpenStreamConfEvent_t {
-    Version_t       apiVer;
-    Version_t       libVer;
-    Version_t       tsrvVer;
-    Version_t       drvrVer;
-} ACSOpenStreamConfEvent_t;
-
-typedef struct ACSCloseStream_t {
-    Nulltype        null;
-} ACSCloseStream_t;
-
-typedef struct ACSCloseStreamConfEvent_t {
-    Nulltype        null;
-} ACSCloseStreamConfEvent_t;
-
-typedef struct ACSAbortStream_t {
-    Nulltype        null;
-} ACSAbortStream_t;
-
-typedef enum ACSUniversalFailure_t {
-    TSERVER_STREAM_FAILED = 0,
-    TSERVER_NO_THREAD = 1,
-    TSERVER_BAD_DRIVER_ID = 2,
-    TSERVER_DEAD_DRIVER = 3,
-    TSERVER_MESSAGE_HIGH_WATER_MARK = 4,
-    TSERVER_FREE_BUFFER_FAILED = 5,
-    TSERVER_SEND_TO_DRIVER = 6,
-    TSERVER_RECEIVE_FROM_DRIVER = 7,
-    TSERVER_REGISTRATION_FAILED = 8,
-    TSERVER_SPX_FAILED = 9,
-    TSERVER_TRACE = 10,
-    TSERVER_NO_MEMORY = 11,
-    TSERVER_ENCODE_FAILED = 12,
-    TSERVER_DECODE_FAILED = 13,
-    TSERVER_BAD_CONNECTION = 14,
-    TSERVER_BAD_PDU = 15,
-    TSERVER_NO_VERSION = 16,
-    TSERVER_ECB_MAX_EXCEEDED = 17,
-    TSERVER_NO_ECBS = 18,
-    TSERVER_NO_SDB = 19,
-    TSERVER_NO_SDB_CHECK_NEEDED = 20,
-    TSERVER_SDB_CHECK_NEEDED = 21,
-    TSERVER_BAD_SDB_LEVEL = 22,
-    TSERVER_BAD_SERVERID = 23,
-    TSERVER_BAD_STREAM_TYPE = 24,
-    TSERVER_BAD_PASSWORD_OR_LOGIN = 25,
-    TSERVER_NO_USER_RECORD = 26,
-    TSERVER_NO_DEVICE_RECORD = 27,
-    TSERVER_DEVICE_NOT_ON_LIST = 28,
-    TSERVER_USERS_RESTRICTED_HOME = 30,
-    TSERVER_NO_AWAYPERMISSION = 31,
-    TSERVER_NO_HOMEPERMISSION = 32,
-    TSERVER_NO_AWAY_WORKTOP = 33,
-    TSERVER_BAD_DEVICE_RECORD = 34,
-    TSERVER_DEVICE_NOT_SUPPORTED = 35,
-    TSERVER_INSUFFICIENT_PERMISSION = 36,
-    TSERVER_NO_RESOURCE_TAG = 37,
-    TSERVER_INVALID_MESSAGE = 38,
-    TSERVER_EXCEPTION_LIST = 39,
-    TSERVER_NOT_ON_OAM_LIST = 40,
-    TSERVER_PBX_ID_NOT_IN_SDB = 41,
-    TSERVER_USER_LICENSES_EXCEEDED = 42,
-    TSERVER_OAM_DROP_CONNECTION = 43,
-    TSERVER_NO_VERSION_RECORD = 44,
-    TSERVER_OLD_VERSION_RECORD = 45,
-    TSERVER_BAD_PACKET = 46,
-    TSERVER_OPEN_FAILED = 47,
-    TSERVER_OAM_IN_USE = 48,
-    TSERVER_DEVICE_NOT_ON_HOME_LIST = 49,
-    TSERVER_DEVICE_NOT_ON_CALL_CONTROL_LIST = 50,
-    TSERVER_DEVICE_NOT_ON_AWAY_LIST = 51,
-    TSERVER_DEVICE_NOT_ON_ROUTE_LIST = 52,
-    TSERVER_DEVICE_NOT_ON_MONITOR_DEVICE_LIST = 53,
-    TSERVER_DEVICE_NOT_ON_MONITOR_CALL_DEVICE_LIST = 54,
-    TSERVER_NO_CALL_CALL_MONITOR_PERMISSION = 55,
-    TSERVER_HOME_DEVICE_LIST_EMPTY = 56,
-    TSERVER_CALL_CONTROL_LIST_EMPTY = 57,
-    TSERVER_AWAY_LIST_EMPTY = 58,
-    TSERVER_ROUTE_LIST_EMPTY = 59,
-    TSERVER_MONITOR_DEVICE_LIST_EMPTY = 60,
-    TSERVER_MONITOR_CALL_DEVICE_LIST_EMPTY = 61,
-    TSERVER_USER_AT_HOME_WORKTOP = 62,
-    TSERVER_DEVICE_LIST_EMPTY = 63,
-    TSERVER_BAD_GET_DEVICE_LEVEL = 64,
-    TSERVER_DRIVER_UNREGISTERED = 65,
-    TSERVER_NO_ACS_STREAM = 66,
-    TSERVER_DROP_OAM = 67,
-    TSERVER_ECB_TIMEOUT = 68,
-    TSERVER_BAD_ECB = 69,
-    TSERVER_ADVERTISE_FAILED = 70,
-    TSERVER_NETWARE_FAILURE = 71,
-    TSERVER_TDI_QUEUE_FAULT = 72,
-    TSERVER_DRIVER_CONGESTION = 73,
-    TSERVER_NO_TDI_BUFFERS = 74,
-    TSERVER_OLD_INVOKEID = 75,
-    TSERVER_HWMARK_TO_LARGE = 76,
-    TSERVER_SET_ECB_TO_LOW = 77,
-    TSERVER_NO_RECORD_IN_FILE = 78,
-    TSERVER_ECB_OVERDUE = 79,
-    TSERVER_BAD_PW_ENCRYPTION = 80,
-    TSERVER_BAD_TSERV_PROTOCOL = 81,
-    TSERVER_BAD_DRIVER_PROTOCOL = 82,
-    TSERVER_BAD_TRANSPORT_TYPE = 83,
-    TSERVER_PDU_VERSION_MISMATCH = 84,
-    TSERVER_VERSION_MISMATCH = 85,
-    TSERVER_LICENSE_MISMATCH = 86,
-    TSERVER_BAD_ATTRIBUTE_LIST = 87,
-    TSERVER_BAD_TLIST_TYPE = 88,
-    TSERVER_BAD_PROTOCOL_FORMAT = 89,
-    TSERVER_OLD_TSLIB = 90,
-    TSERVER_BAD_LICENSE_FILE = 91,
-    TSERVER_NO_PATCHES = 92,
-    TSERVER_SYSTEM_ERROR = 93,
-    TSERVER_OAM_LIST_EMPTY = 94,
-    TSERVER_TCP_FAILED = 95,
-    TSERVER_SPX_DISABLED = 96,
-    TSERVER_TCP_DISABLED = 97,
-    TSERVER_REQUIRED_MODULES_NOT_LOADED = 98,
-    TSERVER_TRANSPORT_IN_USE_BY_OAM = 99,
-    TSERVER_NO_NDS_OAM_PERMISSION = 100,
-    TSERVER_OPEN_SDB_LOG_FAILED = 101,
-    TSERVER_INVALID_LOG_SIZE = 102,
-    TSERVER_WRITE_SDB_LOG_FAILED = 103,
-    TSERVER_NT_FAILURE = 104,
-    TSERVER_LOAD_LIB_FAILED = 105,
-    TSERVER_INVALID_DRIVER = 106,
-    TSERVER_REGISTRY_ERROR = 107,
-    TSERVER_DUPLICATE_ENTRY = 108,
-    TSERVER_DRIVER_LOADED = 109,
-    TSERVER_DRIVER_NOT_LOADED = 110,
-    TSERVER_NO_LOGON_PERMISSION = 111,
-    TSERVER_ACCOUNT_DISABLED = 112,
-    TSERVER_NO_NETLOGON = 113,
-    TSERVER_ACCT_RESTRICTED = 114,
-    TSERVER_INVALID_LOGON_TIME = 115,
-    TSERVER_INVALID_WORKSTATION = 116,
-    TSERVER_ACCT_LOCKED_OUT = 117,
-    TSERVER_PASSWORD_EXPIRED = 118,
-    DRIVER_DUPLICATE_ACSHANDLE = 1000,
-    DRIVER_INVALID_ACS_REQUEST = 1001,
-    DRIVER_ACS_HANDLE_REJECTION = 1002,
-    DRIVER_INVALID_CLASS_REJECTION = 1003,
-    DRIVER_GENERIC_REJECTION = 1004,
-    DRIVER_RESOURCE_LIMITATION = 1005,
-    DRIVER_ACSHANDLE_TERMINATION = 1006,
-    DRIVER_LINK_UNAVAILABLE = 1007,
-    DRIVER_OAM_IN_USE = 1008
-} ACSUniversalFailure_t;
-
-typedef struct ACSUniversalFailureConfEvent_t {
-    ACSUniversalFailure_t error;
-} ACSUniversalFailureConfEvent_t;
-
-typedef struct ACSUniversalFailureEvent_t {
-    ACSUniversalFailure_t error;
-} ACSUniversalFailureEvent_t;
-
-typedef struct ChallengeKey_t {
-    short           length;
-    unsigned char   value[8];
-} ChallengeKey_t;
-
-typedef struct ACSKeyRequest_t {
-    LoginID_t       loginID;
-} ACSKeyRequest_t;
-
-typedef struct ACSKeyReply_t {
-    long            objectID;
-    ChallengeKey_t  key;
-} ACSKeyReply_t;
-
-typedef struct ACSNameSrvRequest_t {
-    StreamType_t    streamType;
-} ACSNameSrvRequest_t;
-
-typedef struct ACSNameAddr_t {
-    char            FAR *serverName;
-    struct {
-        short           length;
-        unsigned char   FAR *value;
-    } serverAddr;
-} ACSNameAddr_t;
-
-typedef struct ACSNameSrvReply_t {
-    Boolean         more;
-    struct {
-        short           count;
-        ACSNameAddr_t   FAR *nameAddr;
-    } list;
-} ACSNameSrvReply_t;
-
-typedef enum ACSAuthType_t {
-    REQUIRES_EXTERNAL_AUTH = -1,
-    AUTH_LOGIN_ID_ONLY = 0,
-    AUTH_LOGIN_ID_IS_DEFAULT = 1,
-    NEED_LOGIN_ID_AND_PASSWD = 2,
-    ANY_LOGIN_ID = 3
-} ACSAuthType_t;
-
-typedef struct ACSAuthInfo_t {
-    ACSAuthType_t   authType;
-    LoginID_t       authLoginID;
-} ACSAuthInfo_t;
-
-typedef struct ACSAuthReply_t {
-    long            objectID;
-    ChallengeKey_t  key;
-    ACSAuthInfo_t   authInfo;
-} ACSAuthReply_t;
-
-typedef enum ACSEncodeType_t {
-    CAN_USE_BINDERY_ENCRYPTION = 1,
-    NDS_AUTH_CONNID = 2,
-    WIN_NT_LOCAL = 3,
-    WIN_NT_NAMED_PIPE = 4,
-    WIN_NT_WRITE_DATA = 5
-} ACSEncodeType_t;
-
-typedef char            WinNTPipe_t[101];
-
-typedef struct ACSAuthReplyTwo_t {
-    long            objectID;
-    ChallengeKey_t  key;
-    ACSAuthInfo_t   authInfo;
-    ACSEncodeType_t encodeType;
-    WinNTPipe_t     pipe;
-} ACSAuthReplyTwo_t;
-
-
-extern void FAR *acs_asn_tbl;    /* encoder-decoder control table */
+#define ST_CSTA stCsta
+#define ST_OAM stOam
+#define ST_DIRECTORY stDirectory
+#define ST_NMSRV stNmsrv
+#define ACS_LEVEL1 acsLevel1
+#define ACS_LEVEL2 acsLevel2
+#define ACS_LEVEL3 acsLevel3
+#define ACS_LEVEL4 acsLevel4
+#define TSERVER_STREAM_FAILED tserverStreamFailed
+#define TSERVER_NO_THREAD tserverNoThread
+#define TSERVER_BAD_DRIVER_ID tserverBadDriverId
+#define TSERVER_DEAD_DRIVER tserverDeadDriver
+#define TSERVER_MESSAGE_HIGH_WATER_MARK tserverMessageHighWaterMark
+#define TSERVER_FREE_BUFFER_FAILED tserverFreeBufferFailed
+#define TSERVER_SEND_TO_DRIVER tserverSendToDriver
+#define TSERVER_RECEIVE_FROM_DRIVER tserverReceiveFromDriver
+#define TSERVER_REGISTRATION_FAILED tserverRegistrationFailed
+#define TSERVER_SPX_FAILED tserverSpxFailed
+#define TSERVER_TRACE tserverTrace
+#define TSERVER_NO_MEMORY tserverNoMemory
+#define TSERVER_ENCODE_FAILED tserverEncodeFailed
+#define TSERVER_DECODE_FAILED tserverDecodeFailed
+#define TSERVER_BAD_CONNECTION tserverBadConnection
+#define TSERVER_BAD_PDU tserverBadPdu
+#define TSERVER_NO_VERSION tserverNoVersion
+#define TSERVER_ECB_MAX_EXCEEDED tserverEcbMaxExceeded
+#define TSERVER_NO_ECBS tserverNoEcbs
+#define TSERVER_NO_SDB tserverNoSdb
+#define TSERVER_NO_SDB_CHECK_NEEDED tserverNoSdbCheckNeeded
+#define TSERVER_SDB_CHECK_NEEDED tserverSdbCheckNeeded
+#define TSERVER_BAD_SDB_LEVEL tserverBadSdbLevel
+#define TSERVER_BAD_SERVERID tserverBadServerid
+#define TSERVER_BAD_STREAM_TYPE tserverBadStreamType
+#define TSERVER_BAD_PASSWORD_OR_LOGIN tserverBadPasswordOrLogin
+#define TSERVER_NO_USER_RECORD tserverNoUserRecord
+#define TSERVER_NO_DEVICE_RECORD tserverNoDeviceRecord
+#define TSERVER_DEVICE_NOT_ON_LIST tserverDeviceNotOnList
+#define TSERVER_USERS_RESTRICTED_HOME tserverUsersRestrictedHome
+#define TSERVER_NO_AWAYPERMISSION tserverNoAwaypermission
+#define TSERVER_NO_HOMEPERMISSION tserverNoHomepermission
+#define TSERVER_NO_AWAY_WORKTOP tserverNoAwayWorktop
+#define TSERVER_BAD_DEVICE_RECORD tserverBadDeviceRecord
+#define TSERVER_DEVICE_NOT_SUPPORTED tserverDeviceNotSupported
+#define TSERVER_INSUFFICIENT_PERMISSION tserverInsufficientPermission
+#define TSERVER_NO_RESOURCE_TAG tserverNoResourceTag
+#define TSERVER_INVALID_MESSAGE tserverInvalidMessage
+#define TSERVER_EXCEPTION_LIST tserverExceptionList
+#define TSERVER_NOT_ON_OAM_LIST tserverNotOnOamList
+#define TSERVER_PBX_ID_NOT_IN_SDB tserverPbxIdNotInSdb
+#define TSERVER_USER_LICENSES_EXCEEDED tserverUserLicensesExceeded
+#define TSERVER_OAM_DROP_CONNECTION tserverOamDropConnection
+#define TSERVER_NO_VERSION_RECORD tserverNoVersionRecord
+#define TSERVER_OLD_VERSION_RECORD tserverOldVersionRecord
+#define TSERVER_BAD_PACKET tserverBadPacket
+#define TSERVER_OPEN_FAILED tserverOpenFailed
+#define TSERVER_OAM_IN_USE tserverOamInUse
+#define TSERVER_DEVICE_NOT_ON_HOME_LIST tserverDeviceNotOnHomeList
+#define TSERVER_DEVICE_NOT_ON_CALL_CONTROL_LIST tserverDeviceNotOnCallControlList
+#define TSERVER_DEVICE_NOT_ON_AWAY_LIST tserverDeviceNotOnAwayList
+#define TSERVER_DEVICE_NOT_ON_ROUTE_LIST tserverDeviceNotOnRouteList
+#define TSERVER_DEVICE_NOT_ON_MONITOR_DEVICE_LIST tserverDeviceNotOnMonitorDeviceList
+#define TSERVER_DEVICE_NOT_ON_MONITOR_CALL_DEVICE_LIST tserverDeviceNotOnMonitorCallDeviceList
+#define TSERVER_NO_CALL_CALL_MONITOR_PERMISSION tserverNoCallCallMonitorPermission
+#define TSERVER_HOME_DEVICE_LIST_EMPTY tserverHomeDeviceListEmpty
+#define TSERVER_CALL_CONTROL_LIST_EMPTY tserverCallControlListEmpty
+#define TSERVER_AWAY_LIST_EMPTY tserverAwayListEmpty
+#define TSERVER_ROUTE_LIST_EMPTY tserverRouteListEmpty
+#define TSERVER_MONITOR_DEVICE_LIST_EMPTY tserverMonitorDeviceListEmpty
+#define TSERVER_MONITOR_CALL_DEVICE_LIST_EMPTY tserverMonitorCallDeviceListEmpty
+#define TSERVER_USER_AT_HOME_WORKTOP tserverUserAtHomeWorktop
+#define TSERVER_DEVICE_LIST_EMPTY tserverDeviceListEmpty
+#define TSERVER_BAD_GET_DEVICE_LEVEL tserverBadGetDeviceLevel
+#define TSERVER_DRIVER_UNREGISTERED tserverDriverUnregistered
+#define TSERVER_NO_ACS_STREAM tserverNoAcsStream
+#define TSERVER_DROP_OAM tserverDropOam
+#define TSERVER_ECB_TIMEOUT tserverEcbTimeout
+#define TSERVER_BAD_ECB tserverBadEcb
+#define TSERVER_ADVERTISE_FAILED tserverAdvertiseFailed
+#define TSERVER_NETWARE_FAILURE tserverNetwareFailure
+#define TSERVER_TDI_QUEUE_FAULT tserverTdiQueueFault
+#define TSERVER_DRIVER_CONGESTION tserverDriverCongestion
+#define TSERVER_NO_TDI_BUFFERS tserverNoTdiBuffers
+#define TSERVER_OLD_INVOKEID tserverOldInvokeid
+#define TSERVER_HWMARK_TO_LARGE tserverHwmarkToLarge
+#define TSERVER_SET_ECB_TO_LOW tserverSetEcbToLow
+#define TSERVER_NO_RECORD_IN_FILE tserverNoRecordInFile
+#define TSERVER_ECB_OVERDUE tserverEcbOverdue
+#define TSERVER_BAD_PW_ENCRYPTION tserverBadPwEncryption
+#define TSERVER_BAD_TSERV_PROTOCOL tserverBadTservProtocol
+#define TSERVER_BAD_DRIVER_PROTOCOL tserverBadDriverProtocol
+#define TSERVER_BAD_TRANSPORT_TYPE tserverBadTransportType
+#define TSERVER_PDU_VERSION_MISMATCH tserverPduVersionMismatch
+#define TSERVER_VERSION_MISMATCH tserverVersionMismatch
+#define TSERVER_LICENSE_MISMATCH tserverLicenseMismatch
+#define TSERVER_BAD_ATTRIBUTE_LIST tserverBadAttributeList
+#define TSERVER_BAD_TLIST_TYPE tserverBadTlistType
+#define TSERVER_BAD_PROTOCOL_FORMAT tserverBadProtocolFormat
+#define TSERVER_OLD_TSLIB tserverOldTslib
+#define TSERVER_BAD_LICENSE_FILE tserverBadLicenseFile
+#define TSERVER_NO_PATCHES tserverNoPatches
+#define TSERVER_SYSTEM_ERROR tserverSystemError
+#define TSERVER_OAM_LIST_EMPTY tserverOamListEmpty
+#define TSERVER_TCP_FAILED tserverTcpFailed
+#define TSERVER_SPX_DISABLED tserverSpxDisabled
+#define TSERVER_TCP_DISABLED tserverTcpDisabled
+#define TSERVER_REQUIRED_MODULES_NOT_LOADED tserverRequiredModulesNotLoaded
+#define TSERVER_TRANSPORT_IN_USE_BY_OAM tserverTransportInUseByOam
+#define TSERVER_NO_NDS_OAM_PERMISSION tserverNoNdsOamPermission
+#define TSERVER_OPEN_SDB_LOG_FAILED tserverOpenSdbLogFailed
+#define TSERVER_INVALID_LOG_SIZE tserverInvalidLogSize
+#define TSERVER_WRITE_SDB_LOG_FAILED tserverWriteSdbLogFailed
+#define TSERVER_NT_FAILURE tserverNtFailure
+#define TSERVER_LOAD_LIB_FAILED tserverLoadLibFailed
+#define TSERVER_INVALID_DRIVER tserverInvalidDriver
+#define TSERVER_REGISTRY_ERROR tserverRegistryError
+#define TSERVER_DUPLICATE_ENTRY tserverDuplicateEntry
+#define TSERVER_DRIVER_LOADED tserverDriverLoaded
+#define TSERVER_DRIVER_NOT_LOADED tserverDriverNotLoaded
+#define TSERVER_NO_LOGON_PERMISSION tserverNoLogonPermission
+#define TSERVER_ACCOUNT_DISABLED tserverAccountDisabled
+#define TSERVER_NO_NETLOGON tserverNoNetlogon
+#define TSERVER_ACCT_RESTRICTED tserverAcctRestricted
+#define TSERVER_INVALID_LOGON_TIME tserverInvalidLogonTime
+#define TSERVER_INVALID_WORKSTATION tserverInvalidWorkstation
+#define TSERVER_ACCT_LOCKED_OUT tserverAcctLockedOut
+#define TSERVER_PASSWORD_EXPIRED tserverPasswordExpired
+#define TSERVER_INVALID_HEARTBEAT_INTERVAL tserverInvalidHeartbeatInterval
+#define DRIVER_DUPLICATE_ACSHANDLE driverDuplicateAcshandle
+#define DRIVER_INVALID_ACS_REQUEST driverInvalidAcsRequest
+#define DRIVER_ACS_HANDLE_REJECTION driverAcsHandleRejection
+#define DRIVER_INVALID_CLASS_REJECTION driverInvalidClassRejection
+#define DRIVER_GENERIC_REJECTION driverGenericRejection
+#define DRIVER_RESOURCE_LIMITATION driverResourceLimitation
+#define DRIVER_ACSHANDLE_TERMINATION driverAcshandleTermination
+#define DRIVER_LINK_UNAVAILABLE driverLinkUnavailable
+#define DRIVER_OAM_IN_USE driverOamInUse
+#define REQUIRES_EXTERNAL_AUTH requiresExternalAuth
+#define AUTH_LOGIN_ID_ONLY authLoginIdOnly
+#define AUTH_LOGIN_ID_IS_DEFAULT authLoginIdIsDefault
+#define NEED_LOGIN_ID_AND_PASSWD needLoginIdAndPasswd
+#define ANY_LOGIN_ID anyLoginId
+#define CAN_USE_BINDERY_ENCRYPTION canUseBinderyEncryption
+#define NDS_AUTH_CONNID ndsAuthConnid
+#define WIN_NT_LOCAL winNtLocal
+#define WIN_NT_NAMED_PIPE winNtNamedPipe
+#define WIN_NT_WRITE_DATA winNtWriteData
 
 #endif

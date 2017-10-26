@@ -174,9 +174,10 @@ void AvayaCtiUI::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_AM_NOTREADY_RADIO, m_radioBtnGroup2);
 	DDX_Radio(pDX, IDC_PARTICIPATIONTYPE_RADIO1, m_radioBtnGroup3);
 	DDX_Radio(pDX, IDC_ACTIVE_RADIO, m_radioBtnGroup4);
-	
+
 	DDX_Text(pDX, IDC_ROUTING_EDIT1, m_strRouting);
 
+	DDX_Control(pDX, IDC_ROUTING_TYPE, m_cbRoutingType);
 }
 
 void AvayaCtiUI::MonitoringKafka()
@@ -386,6 +387,12 @@ BEGIN_MESSAGE_MAP(AvayaCtiUI, CDialog)
 	ON_BN_CLICKED(IDC_ROUTING_INSERT, &AvayaCtiUI::OnBnClickedRoutingInsert)
 	ON_BN_CLICKED(IDC_ROUTING_DELETE, &AvayaCtiUI::OnBnClickedRoutingDelete)
 	ON_BN_CLICKED(IDC_ROUTING_SELECT, &AvayaCtiUI::OnBnClickedRoutingSelect)
+	ON_CBN_SELCHANGE(IDC_ROUTING_TYPE, &AvayaCtiUI::OnCbnSelchangeRoutingType)
+	ON_CBN_DROPDOWN(IDC_ROUTING_TYPE, &AvayaCtiUI::OnCbnDropdownRoutingType)
+	ON_BN_CLICKED(IDC_ROUTING_UPDATA, &AvayaCtiUI::OnBnClickedRoutingUpdata)
+	ON_BN_CLICKED(IDC_CLEAR_BTN, &AvayaCtiUI::OnBnClickedClearBtn)
+	ON_BN_CLICKED(IDC_ROUTING_REGISTER, &AvayaCtiUI::OnBnClickedRoutingRegister)
+	ON_BN_CLICKED(IDC_ROUTING_REGISTERCANCEL, &AvayaCtiUI::OnBnClickedRoutingRegistercancel)
 END_MESSAGE_MAP()
 
 
@@ -766,18 +773,87 @@ void AvayaCtiUI::OnBnClickedTransferBtn()
 void AvayaCtiUI::OnBnClickedRoutingInsert()
 {
 	UpdateData(TRUE);//m_strRouting
-	
+	string message = m_pRoutingObject->InsertNumber(m_strRouting.GetBuffer(m_strRouting.GetLength()),
+		m_strRoutingType.GetBuffer(m_strRoutingType.GetLength()));
+	UpdataViewStatus(message);
 }
 
 
 void AvayaCtiUI::OnBnClickedRoutingDelete()
 {
-
+	UpdateData(TRUE);//m_strRouting
+	string message = m_pRoutingObject->DeleteNumber(m_strRouting.GetBuffer(m_strRouting.GetLength()));
+	UpdataViewStatus(message);
 }
 
+
+void AvayaCtiUI::OnBnClickedRoutingUpdata()
+{
+	UpdateData(TRUE);//m_strRouting
+	string message = m_pRoutingObject->UpdataNumber(m_strRouting.GetBuffer(m_strRouting.GetLength()),
+		m_strRoutingType.GetBuffer(m_strRoutingType.GetLength()));
+	UpdataViewStatus(message);
+}
 
 void AvayaCtiUI::OnBnClickedRoutingSelect()
 {
-
+	UpdateData(TRUE);//m_strRouting
+	vector<string> data;
+	string message = m_pRoutingObject->SelectNumber(m_strRouting.GetBuffer(m_strRouting.GetLength()),data);
+	UpdataViewStatus(message);
+	message.clear();
+	if (!data.empty())
+	{
+		for (auto iter = data.begin(); iter != data.end(); iter++)
+		{
+			message += *iter;
+			message += "\t";
+		}
+	}
+	UpdataViewStatus(message);
 }
 
+
+
+void AvayaCtiUI::OnCbnSelchangeRoutingType()
+{
+	int com_num = m_cbRoutingType.GetCurSel();
+	if (com_num != LB_ERR)
+	{
+		m_cbRoutingType.GetLBText(com_num, m_strRoutingType);
+	}
+}
+
+
+void AvayaCtiUI::OnCbnDropdownRoutingType()
+{
+	m_cbRoutingType.AddString("VIP");
+	m_cbRoutingType.AddString("黑名单");
+	m_cbRoutingType.AddString("重复报警");
+}
+
+
+
+void AvayaCtiUI::OnBnClickedClearBtn()
+{
+	m_strAgentStatus.Empty();
+	UpdateData(FALSE);
+}
+
+void AvayaCtiUI::UpdataViewStatus(string mes)
+{
+	//UpdateData(TRUE);
+	m_strAgentStatus = m_strAgentStatus + mes.c_str() + "\r\n";
+	UpdateData(FALSE);
+}
+
+void AvayaCtiUI::OnBnClickedRoutingRegister()
+{
+	//m_pRoutingObject->RouteRegister();//DeviceID_t 是什么,当前坐席电话？设备名？
+}
+
+
+void AvayaCtiUI::OnBnClickedRoutingRegistercancel()
+{
+	m_pRoutingObject->RouteRegisterCancel(m_pRoutingObject->routeRegisterReqID);
+}

@@ -48,24 +48,23 @@ private:
 	// variable attach with Current AgentStatus readonly EditBox.
 	CEdit m_Status;
 	void InitializeDialog();
+	void UpdataViewStatus(string);
+
 public:
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnBnClickedBegin();
 	CString m_message;
 	CString m_strRouting;
-	afx_msg void OnBnClickedLoginBtn();
 	int m_radioBtnGroup1;
-	afx_msg void OnBnClickedRadioBtnGroup1();
 	int m_radioBtnGroup2;
+	int m_radioBtnGroup3;
+	int m_radioBtnGroup4;
 
 	afx_msg void OnBnClickedBegin();
 	afx_msg void OnBnClickedLoginBtn();
 	afx_msg void OnBnClickedRadioBtnGroup1();
 	afx_msg void OnBnClickedRadioBtnGroup2();
-	int m_radioBtnGroup3;
 	afx_msg void OnBnClickedRadioBtnGroup3();
-	int m_radioBtnGroup4;
-	void OnBnClickedRadioBtnGroup4();
+	afx_msg void OnBnClickedRadioBtnGroup4();
 	afx_msg void OnBnClickedLogoutBtn();
 	afx_msg void OnBnClickedStateChangeBtn();
 	afx_msg void OnBnClickedChkstateBtn();
@@ -89,4 +88,12 @@ public:
 	afx_msg void OnBnClickedRoutingInsert();
 	afx_msg void OnBnClickedRoutingDelete();
 	afx_msg void OnBnClickedRoutingSelect();
+	CComboBox m_cbRoutingType;
+	CString m_strRoutingType;
+	afx_msg void OnCbnSelchangeRoutingType();
+	afx_msg void OnCbnDropdownRoutingType();
+	afx_msg void OnBnClickedRoutingUpdata();
+	afx_msg void OnBnClickedClearBtn();
+	afx_msg void OnBnClickedRoutingRegister();
+	afx_msg void OnBnClickedRoutingRegistercancel();
 };

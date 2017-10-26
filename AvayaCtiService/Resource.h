@@ -112,15 +112,20 @@
 #define IDC_ROUTING_EDIT1               1101
 #define IDC_ROUTING_INSERT              1102
 #define IDC_BUTTON3                     1103
+#define IDC_ROUTING_REGISTER            1103
 #define IDC_ROUTING_DELETE              1104
 #define IDC_ROUTING_GRO                 1105
+#define IDC_ROUTING_REGISTERCANCEL      1107
+#define IDC_ROUTING_TYPE                1108
+#define IDC_ROUTING_UPDATA              1109
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        318
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1099
+#define _APS_NEXT_CONTROL_VALUE         1104
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

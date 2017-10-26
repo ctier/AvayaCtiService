@@ -195,29 +195,11 @@
     <ClInclude Include="AvayaCtiService.h" />
     <ClInclude Include="AvayaCtiUI.h" />
     <ClInclude Include="Constant.h" />
-    <ClInclude Include="inc\Acs.h" />
-    <ClInclude Include="inc\Acsdefs.h" />
-    <ClInclude Include="inc\Acslimit.h" />
-    <ClInclude Include="inc\Attpdefs.h" />
-    <ClInclude Include="inc\Attpriv.h" />
-    <ClInclude Include="inc\Cdi.h" />
-    <ClInclude Include="inc\Csta.h" />
-    <ClInclude Include="inc\Cstadefs.h" />
-    <ClInclude Include="inc\drvrdefs.h" />
-    <ClInclude Include="inc\Insttsdr.h" />
-    <ClInclude Include="inc\json-forwards.h" />
-    <ClInclude Include="inc\json.h" />
-    <ClInclude Include="inc\rdkafka.h" />
-    <ClInclude Include="inc\rdkafkacpp.h" />
-    <ClInclude Include="inc\Sdb.h" />
-    <ClInclude Include="inc\sdbdefs.h" />
-    <ClInclude Include="inc\Tdi.h" />
-    <ClInclude Include="inc\Tdrvr.h" />
-    <ClInclude Include="inc\Tsplatfm.h" />
     <ClInclude Include="KafkaConsumer.h" />
     <ClInclude Include="KafkaProducer.h" />
     <ClInclude Include="MySQLInterface.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="StatusRecord.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TSAPIInterface.h" />
   </ItemGroup>
@@ -230,6 +212,7 @@
     <ClCompile Include="KafkaConsumer.cpp" />
     <ClCompile Include="KafkaProducer.cpp" />
     <ClCompile Include="MySQLInterface.cpp" />
+    <ClCompile Include="StatusRecord.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

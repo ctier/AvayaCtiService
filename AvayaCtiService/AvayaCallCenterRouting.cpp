@@ -90,7 +90,8 @@ string AvayaCallCenterRouting::SelectNumber(const char *telephonenumber, vector<
 
 void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData)
 {
-	RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
+	//RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
+	routeRegisterReqID = routeRequestExt.routeRegisterReqID;//是同一个吗？
 	RoutingCrossRefID_t routingCrossRefID = routeRequestExt.routingCrossRefID;//路由会话的唯一句柄
 	CalledDeviceID_t currentRoute = routeRequestExt.currentRoute;//指定调用的目标
 	CallingDeviceID_t callingDevice = routeRequestExt.callingDevice;//指定调用起始设备
