@@ -50,16 +50,22 @@ private:
 	void InitializeDialog();
 public:
 	DECLARE_MESSAGE_MAP()
-
+	afx_msg void OnBnClickedBegin();
 	CString m_message;
 	CString m_strRouting;
+	afx_msg void OnBnClickedLoginBtn();
 	int m_radioBtnGroup1;
+	afx_msg void OnBnClickedRadioBtnGroup1();
 	int m_radioBtnGroup2;
 
 	afx_msg void OnBnClickedBegin();
 	afx_msg void OnBnClickedLoginBtn();
 	afx_msg void OnBnClickedRadioBtnGroup1();
 	afx_msg void OnBnClickedRadioBtnGroup2();
+	int m_radioBtnGroup3;
+	afx_msg void OnBnClickedRadioBtnGroup3();
+	int m_radioBtnGroup4;
+	void OnBnClickedRadioBtnGroup4();
 	afx_msg void OnBnClickedLogoutBtn();
 	afx_msg void OnBnClickedStateChangeBtn();
 	afx_msg void OnBnClickedChkstateBtn();
@@ -72,6 +78,14 @@ public:
 	afx_msg void OnBnClickedCancelholdBtn();
 	afx_msg void OnBnClickedPickupBtn();
 	afx_msg void OnBnClickedMonitorcallbtn();
+	afx_msg void OnBnClickedSnapshotBtn();
+	afx_msg void OnBnClickedParticipationtypeRadio1();
+	afx_msg void OnBnClickedConsultBtn();
+	afx_msg void OnBnClickedSnapshotBtn2();
+	afx_msg void OnBnClickedConfBtn();
+	afx_msg void OnBnClickedTransferBtn();
+	afx_msg void OnBnClickedActiveRadio();
+	
 	afx_msg void OnBnClickedRoutingInsert();
 	afx_msg void OnBnClickedRoutingDelete();
 	afx_msg void OnBnClickedRoutingSelect();

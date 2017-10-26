@@ -128,14 +128,14 @@ void AvayaCallCenterUserAgent::AgentTransferCall(DeviceID_t deviceID, long heldC
 	m_pTsapiInterfaceObject->AgentTransferCall(deviceID, heldCall, activeCall);
 }
 //This function is used to Conference the Call
-void AvayaCallCenterUserAgent::AgentConferenceCall(DeviceID_t deviceID, long heldCall, long activeCall)//三方通话
+void AvayaCallCenterUserAgent::AgentConferenceCall(DeviceID_t checkedDevice, DeviceID_t deviceID)//三方通话
 {
-	m_pTsapiInterfaceObject->AgentConferenceCall(deviceID, heldCall, activeCall);
+	m_pTsapiInterfaceObject->AgentConferenceCall(checkedDevice, deviceID);
 }
 //This function is used to Consultation the Call
-void AvayaCallCenterUserAgent::AgentConsultationCall(DeviceID_t deviceID, long activeCall, DeviceID_t calledDevice)//两方求助电话
+void AvayaCallCenterUserAgent::AgentConsultationCall(DeviceID_t deviceID,DeviceID_t calledDevice)//两方求助电话
 {
-	m_pTsapiInterfaceObject->AgentConsultationCall(deviceID, activeCall, calledDevice);
+	m_pTsapiInterfaceObject->AgentConsultationCall(deviceID,calledDevice);
 
 }
 //This function is used to Reconnect the Call  
@@ -144,12 +144,34 @@ void AvayaCallCenterUserAgent::AgentReconnectCall(DeviceID_t deviceID, long held
 {
 	m_pTsapiInterfaceObject->AgentReconnectCall(deviceID, heldCall, activeCall);
 }
-//通话监听
-//snapshot get the callid
-//single step conference(slient)
-map<string, string> monitorDevice;
-void AvayaCallCenterUserAgent::AgentMonitorCall(DeviceID_t deviceID, DeviceID_t checkedDevice)//从两方求助状态重连电话
+//通话监听、强插
+
+void AvayaCallCenterUserAgent::AgentMonitorCall(DeviceID_t checkedDevice, DeviceID_t deviceID,string type)//从两方求助状态重连电话
 {
 	//m_pTsapiInterfaceObject->AgentReconnectCall(deviceID, heldCall, activeCall);
+	//m_pTsapiInterfaceObject->SnapshotDevice(checkedDevice);
+	ATTParticipationType_t participationType;
+	if (type == "PT_ACTIVE") {
+		participationType = PT_ACTIVE;
+	}
+	else if(type == "PT_SILENT")
+	{
+		participationType = PT_SILENT;
+	}
+	else
+	{
+		return;
+	}
+	m_pTsapiInterfaceObject->SingleStepConferenceCall(checkedDevice, deviceID, participationType);
+}
+
+void AvayaCallCenterUserAgent::SnapshotDevice(DeviceID_t checkedDevice) {
 	m_pTsapiInterfaceObject->SnapshotDevice(checkedDevice);
 }
+
+
+//单步转移、强接
+void AvayaCallCenterUserAgent::AgentSingleStepTransferCall(DeviceID_t calledDevice, DeviceID_t checkedDevice) {
+	m_pTsapiInterfaceObject->SingleStepTransferCall(calledDevice,checkedDevice);
+}
+

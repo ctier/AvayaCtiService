@@ -48,9 +48,11 @@
 //CSTAUniversalFailure_t
 #define genericUnspecified 0
 #define genericOperation 1
+#define VALUE_OUT_OF_RANGE 3
 #define invalidCstaDeviceIdentifier 12
 #define invalidObjectState 22
 #define resourceBusy 33
+	
 
 //LocalConnectionState_t
 #define csNone -1
@@ -110,10 +112,10 @@ public:
 
 
 	//This function is used to Conference the Call
-	void AgentConferenceCall(DeviceID_t D1, long C1, long C2);//三方通话
+	void AgentConferenceCall(DeviceID_t D1,DeviceID_t D2);//三方通话
 	//单步电话会议 //未写
 	//This function is used to Consultation the Call
-	void AgentConsultationCall(DeviceID_t D1, long C1, DeviceID_t D3);//两方求助电话
+	void AgentConsultationCall(DeviceID_t D1, DeviceID_t D3);//两方求助电话
 	//This function is used to Reconnect the Call  
 	// activeCall (C2- D1)   heldCall (C1- D1)
 	void AgentReconnectCall(DeviceID_t D1, long C1, long C2);//从两方求助状态重连电话
@@ -125,16 +127,18 @@ public:
 	void StartMonitor(DeviceID_t);			// for monitoring a device
 	// This method is used to remove the monitor from the Station Extension
 	void StopMonitor(CSTAMonitorCrossRefID_t m_lMonitorCrossRefID);		// for removing the monitor
-
+	//This function get the device  information about calls associated with a given CSTA device
 	void SnapshotDevice(DeviceID_t deviceId);
-	void SingleStepConferenceCall(DeviceID_t deviceId);
+	//This function monitor the talking device 
+	void SingleStepConferenceCall(DeviceID_t checkedDevice, DeviceID_t device, ATTParticipationType_t type);
+	
+	void SingleStepTransferCall(DeviceID_t calledDevice, DeviceID_t checkedDevice);
 
 	//Routing Service   //CTI调用  不开放给Agent  //参数怎么用？默认？
 	void RouteEndInv(RouteRegisterReqID_t, RoutingCrossRefID_t);
 	void RouteRegisterCancel(RouteRegisterReqID_t);
 	void RouteRegister(DeviceID_t*);
-	void RouteSelectInv(RouteRegisterReqID_t,RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean);
-
+	void RouteSelectInv(RouteRegisterReqID_t,RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean, PrivateData_t *);
 	~TSAPIInterface();
 
 	/////整理返回消息
@@ -155,7 +159,8 @@ private :
 	map<InvokeID_t, string> m_InvokeID2DeviceID;//绑定请求ID与请求设备ID
 	map<InvokeID_t, string> m_InvokeID2ActName;//绑定请求ID与操作名
 
-	map<string, string> m_DeviceCallID;//设备的CALLID
+	map<string, ConnectionID_t> m_activeCall;//设备的正在通话的connectionID
+	map<string, ConnectionID_t> m_heldCall;//设备正在保持的connectionID
 
 
 	ACSHandle_t m_lAcsHandle;	// Handle for ACS Stream
@@ -171,7 +176,7 @@ private :
 	void HandleACSConfirmation(CSTAEvent_t);
 	// This function will process all CSTA Confimation Events
 	void HandleCSTAConfirmation(CSTAEvent_t, ATTPrivateData_t);
-	// This function will process all CSTAUNSOLICITED Events
+	// This function will process all CSTA UNSOLICITED Events
 	void HandleCSTAUnsolicited(CSTAEvent_t);
 	// This function will process all CSTAEVENTREPORT Events
 	void HandleCSTAEventReport(CSTAEvent_t, ATTPrivateData_t);

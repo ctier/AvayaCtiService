@@ -17,6 +17,7 @@ private:
 
 	//vector<string> selectline;
 	//string Querystr;
+	RouteRegisterReqID_t routeRegisterReqID;
 
 	bool init();
 public:
@@ -33,7 +34,7 @@ public:
 
 	void RouteEndInv(RouteRegisterReqID_t, RoutingCrossRefID_t);
 	void RouteRegisterCancel(RouteRegisterReqID_t);
-	void RouteSelectInv(RouteRegisterReqID_t, RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean);
+	void RouteSelectInv(RouteRegisterReqID_t, RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean, PrivateData_t *);
 	//Routing Service Group Event
 	//map<string, string>
 	void RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData);

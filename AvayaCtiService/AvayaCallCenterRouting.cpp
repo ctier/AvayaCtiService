@@ -28,7 +28,7 @@ AvayaCallCenterRouting::~AvayaCallCenterRouting()
 	delete m_pMySQLInterface;
 }
 
-
+//？ 什么时候发，谁调用
 void AvayaCallCenterRouting::RouteEndInv(RouteRegisterReqID_t RouteRegisterReqID, RoutingCrossRefID_t RoutingCrossRefID)
 {
 	m_pTsapiInterfaceObject->RouteEndInv(RouteRegisterReqID, RoutingCrossRefID);
@@ -45,10 +45,10 @@ void AvayaCallCenterRouting::RouteRegister(DeviceID_t* routingDevice)
 }
 
 void AvayaCallCenterRouting::RouteSelectInv(RouteRegisterReqID_t routeRegisterReqID, RoutingCrossRefID_t routingCrossRefID,
-	DeviceID_t *routeSelected, RetryValue_t remainRetry, SetUpValues_t *setupInformation, Boolean routeUsedReq)
+	DeviceID_t *routeSelected, RetryValue_t remainRetry, SetUpValues_t *setupInformation, Boolean routeUsedReq, PrivateData_t *privateData)
 {
 	m_pTsapiInterfaceObject->RouteSelectInv(routeRegisterReqID, routingCrossRefID,
-		routeSelected, remainRetry, setupInformation, routeUsedReq);
+		routeSelected, remainRetry, setupInformation, routeUsedReq, privateData);
 }
 
 string AvayaCallCenterRouting::InsertNumber(const char *telephonenumber,const char *type)
@@ -103,6 +103,92 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 
 	if (attPrivateData((ATTPrivateData_t *)&privateData, &att_event) == ATT_ROUTE_REQUEST)
 	{
-		//att_event.u.routeRequest;
+		att_event.u.routeRequest;
 	}
+
+	//根据  指定要路由的调用的 callID  ,在数据库中查询，分情况对调用callID进行操作
+	string callID = to_string(routedCall.callID);
+	const char* telephonenumber = callID.c_str();
+	vector<string> data;
+	string error = SelectNumber(telephonenumber, data);
+	ATTPrivateData_t m_stPrivateData;	
+
+	if (data[2] == "VIP")
+	{
+		//RetCode_t m_nRetCode = attV6RouteSelect(&m_stPrivateData, WM_AUTO_IN, 0, TRUE);
+
+		RouteSelectInv(
+			routeRegisterReqID,
+			routingCrossRefID,
+			(DeviceID_t *)currentRoute.deviceID,
+			1,
+			&setupInformation,
+			TRUE,
+			NULL);
+			//(PrivateData_t *)&m_stPrivateData);
+	}
+	else if (data[2] == "黑名单")
+	{
+		//不选？
+	}
+	else//普通
+	{
+
+		RouteSelectInv(
+			routeRegisterReqID,
+			routingCrossRefID,
+			(DeviceID_t *)currentRoute.deviceID,
+			1,
+			&setupInformation,
+			TRUE,
+			NULL);
+	}
+
+}
+
+void AvayaCallCenterRouting::RouteEndEvent(CSTARouteEndEvent_t routeEnd)
+{
+	map<string, string> mes;
+
+	RouteRegisterReqID_t routeRegisterReqID = routeEnd.routeRegisterReqID;
+	RoutingCrossRefID_t routingCrossRefID = routeEnd.routingCrossRefID;//请求路由到的坐席ID,在CSTARouteRequestExtEvent中收到该句柄
+	CSTAUniversalFailure_t errorValue = routeEnd.errorValue;
+	if (errorValue == 0)
+	{
+		mes["error"] = "GENERIC_UNSPECIFIED";
+	}
+	else if (errorValue == 41)
+	{
+		mes["error"] = "GENERIC_SUBSCRIBED_RESOURCE_AVAILABILITY";
+	}//...
+
+}
+
+
+void AvayaCallCenterRouting::RouteRegisterAbortEvent(CSTARouteRegisterAbortEvent_t registerAbort)
+{
+	RouteRegisterReqID_t routeRegisterReqID = registerAbort.routeRegisterReqID;
+	//写入数据库  发送监控
+
+}
+
+void AvayaCallCenterRouting::RouteUsedExtEvent(CSTARouteUsedExtEvent_t routeUsedExt)
+{
+	RouteRegisterReqID_t routeRegisterReqID = routeUsedExt.routeRegisterReqID;
+	RoutingCrossRefID_t routingCrossRefID = routeUsedExt.routingCrossRefID;
+	CalledDeviceID_t routeUsed = routeUsedExt.routeUsed;
+	CallingDeviceID_t callingDevice = routeUsedExt.callingDevice;
+	unsigned char domain = routeUsedExt.domain;
+	/*
+	ATTEvent_t att_event;
+	
+	if (attPrivateData((ATTPrivateData_t *)&privateData, &att_event) == ATT_ROUTE_USED)
+	{
+		char* destRoute = att_event.u.routeUsed.destRoute;//指定非 PBX 目的地的 TAC/ARS/AAR 信息。
+	}
+	*/
+
+	//?除了确认 事件 还有什么用
+	//写入数据库  发送监控
+
 }

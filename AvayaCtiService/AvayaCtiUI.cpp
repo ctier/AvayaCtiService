@@ -46,6 +46,10 @@ AvayaCtiUI::AvayaCtiUI(CWnd* pParent /*=NULL*/)
 	
 	, m_message(_T(""))
 	, m_strRouting(_T(""))
+	, m_radioBtnGroup1(0)
+	, m_radioBtnGroup2(0)
+	, m_radioBtnGroup3(0)
+	, m_radioBtnGroup4(0)
 {
 	m_pTSAPIInterface = NULL;
 	m_pAgtObject = NULL;
@@ -166,7 +170,13 @@ void AvayaCtiUI::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_VIEWSTATE, m_Status);
 
 	DDX_Text(pDX, IDC_MESSAGE, m_message);
+	DDX_Radio(pDX, IDC_WORKMODE_RADIO1, m_radioBtnGroup1);
+	DDX_Radio(pDX, IDC_AM_NOTREADY_RADIO, m_radioBtnGroup2);
+	DDX_Radio(pDX, IDC_PARTICIPATIONTYPE_RADIO1, m_radioBtnGroup3);
+	DDX_Radio(pDX, IDC_ACTIVE_RADIO, m_radioBtnGroup4);
+	
 	DDX_Text(pDX, IDC_ROUTING_EDIT1, m_strRouting);
+
 }
 
 void AvayaCtiUI::MonitoringKafka()
@@ -245,6 +255,11 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 		m_pAgtObject->AgentAnswerCall(&receive_message["DeviceID"][0], stoi(receive_message["callID"]));
 		break;
 	}
+	case "AgentClearConnection"_hash:
+	{
+		m_pAgtObject->AgentClearConnection(&receive_message["DeviceID"][0], stoi(receive_message["callID"]));
+		break;
+	}
 	case "AgentDisconnectCall"_hash:
 	{
 		m_pAgtObject->AgentDisconnectCall(&receive_message["DeviceID"][0], stoi(receive_message["callID"]));
@@ -295,12 +310,12 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 	}
 	case "AgentConferenceCall"_hash:
 	{
-		m_pAgtObject->AgentConferenceCall(&receive_message["DeviceID"][0], stoi(receive_message["heldCall"]), stoi(receive_message["activeCall"]));
+		m_pAgtObject->AgentConferenceCall(&receive_message["CheckedDevice"][0], &receive_message["CalledDevice"][0]);
 		break;
 	}
 	case "AgentConsultationCall"_hash:
 	{
-		m_pAgtObject->AgentConsultationCall(&receive_message["DeviceID"][0], stoi(receive_message["activeCall"]), &receive_message["calledDevice"][0]);
+		m_pAgtObject->AgentConsultationCall(&receive_message["DeviceID"][0], &receive_message["CalledDevice"][0]);
 		break;
 	}
 	case "AgentReconnectCall"_hash:
@@ -308,30 +323,26 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 		m_pAgtObject->AgentReconnectCall(&receive_message["DeviceID"][0], stoi(receive_message["heldCall"]), stoi(receive_message["activeCall"]));
 		break;
 	}
-	//Routing Service  不开放给客户端
-	/*
-	case "RouteEnd"_hash://
+	case "SnapshotDevice"_hash:
 	{
+		m_pAgtObject->SnapshotDevice(&receive_message["CheckedDevice"][0]);
 		break;
 	}
-	case "RouteRegisterCancel"_hash://
+	case "AgentMonitorCall"_hash:
 	{
+		m_pAgtObject->AgentMonitorCall(&receive_message["CheckedDevice"][0], &receive_message["DeviceID"][0],&receive_message["ParticipationType"][0]);
 		break;
 	}
-	case "RouteRegister"_hash://
+	case "AgentSingleStepConferenceCall"_hash:
 	{
+		m_pAgtObject->AgentMonitorCall( &receive_message["CheckedDevice"][0], &receive_message["CalledDevice"][0], &receive_message["ParticipationType"][0]);
 		break;
 	}
-	case "RouteSelectInv"_hash://
+	case "AgentSingleStepTransferCall"_hash:
 	{
+		m_pAgtObject->AgentSingleStepTransferCall(&receive_message["CalledDevice"][0], &receive_message["CheckedDevice"][0]);
 		break;
 	}
-	case "RouteSelect"_hash://
-	{
-		break;
-	}
-	*/
-	//
 	default:
 	{
 		cerr << "without this interface : " << method << endl;
@@ -344,6 +355,34 @@ bool AvayaCtiUI::SelectTSAPIInterface(string message)
 
 BEGIN_MESSAGE_MAP(AvayaCtiUI, CDialog)
 	ON_BN_CLICKED(IDC_Begin, &AvayaCtiUI::OnBnClickedBegin)
+	ON_BN_CLICKED(IDC_LOGIN_BTN, &AvayaCtiUI::OnBnClickedLoginBtn)
+	ON_BN_CLICKED(IDC_WORKMODE_RADIO1, &AvayaCtiUI::OnBnClickedRadioBtnGroup1)
+	ON_BN_CLICKED(IDC_WORKMODE_RADIO2, &AvayaCtiUI::OnBnClickedRadioBtnGroup1)
+	ON_BN_CLICKED(IDC_AM_NOTREADY_RADIO, &AvayaCtiUI::OnBnClickedRadioBtnGroup2)
+	ON_BN_CLICKED(IDC_AM_READY_RADIO, &AvayaCtiUI::OnBnClickedRadioBtnGroup2)
+	ON_BN_CLICKED(IDC_AM_BUSY_RADIO, &AvayaCtiUI::OnBnClickedRadioBtnGroup2)
+	ON_BN_CLICKED(IDC_LOGOUT_BTN, &AvayaCtiUI::OnBnClickedLogoutBtn)
+	ON_BN_CLICKED(IDC_STATE_CHANGE_BTN, &AvayaCtiUI::OnBnClickedStateChangeBtn)
+	ON_BN_CLICKED(IDC_CHKSTATE_BTN, &AvayaCtiUI::OnBnClickedChkstateBtn)
+	ON_BN_CLICKED(IDC_CALL_BTN, &AvayaCtiUI::OnBnClickedCallBtn)
+	ON_BN_CLICKED(IDC_MONITOR_START_BTN, &AvayaCtiUI::OnBnClickedMonitorStartBtn)
+	ON_BN_CLICKED(IDC_MONITOR_STOP_BTN, &AvayaCtiUI::OnBnClickedMonitorStopBtn)
+	ON_BN_CLICKED(IDC_ANSWER_BTN, &AvayaCtiUI::OnBnClickedAnswerBtn)
+	ON_BN_CLICKED(IDC_CLEARCON_BTN, &AvayaCtiUI::OnBnClickedClearconBtn)
+	ON_BN_CLICKED(IDC_HOLD_BTN, &AvayaCtiUI::OnBnClickedHoldBtn)
+	ON_BN_CLICKED(IDC_CANCELHOLD_BTN, &AvayaCtiUI::OnBnClickedCancelholdBtn)
+	ON_BN_CLICKED(IDC_PICKUP_BTN, &AvayaCtiUI::OnBnClickedPickupBtn)
+	ON_BN_CLICKED(IDC_MonitorCall_btn, &AvayaCtiUI::OnBnClickedMonitorcallbtn)
+	ON_BN_CLICKED(IDC_SNAPSHOT_BTN, &AvayaCtiUI::OnBnClickedSnapshotBtn)
+	ON_BN_CLICKED(IDC_PARTICIPATIONTYPE_RADIO1, &AvayaCtiUI::OnBnClickedRadioBtnGroup3)
+	ON_BN_CLICKED(IDC_PARTICIPATIONTYPE_RADIO2, &AvayaCtiUI::OnBnClickedRadioBtnGroup3)
+	ON_BN_CLICKED(IDC_CONSULT_BTN, &AvayaCtiUI::OnBnClickedConsultBtn)
+	ON_BN_CLICKED(IDC_SNAPSHOT_BTN2, &AvayaCtiUI::OnBnClickedSnapshotBtn2)
+	ON_BN_CLICKED(IDC_CONF_BTN, &AvayaCtiUI::OnBnClickedConfBtn)
+	ON_BN_CLICKED(IDC_TRANSFER_BTN, &AvayaCtiUI::OnBnClickedTransferBtn)
+	ON_BN_CLICKED(IDC_ACTIVE_RADIO, &AvayaCtiUI::OnBnClickedRadioBtnGroup4)
+	ON_BN_CLICKED(IDC_HELD_RADIO, &AvayaCtiUI::OnBnClickedRadioBtnGroup4)
+	
 	ON_BN_CLICKED(IDC_ROUTING_INSERT, &AvayaCtiUI::OnBnClickedRoutingInsert)
 	ON_BN_CLICKED(IDC_ROUTING_DELETE, &AvayaCtiUI::OnBnClickedRoutingDelete)
 	ON_BN_CLICKED(IDC_ROUTING_SELECT, &AvayaCtiUI::OnBnClickedRoutingSelect)
@@ -363,6 +402,366 @@ void AvayaCtiUI::OnBnClickedBegin()
 
 }
 
+CString workmode = "3";
+CString agentmode = "Not Ready";
+CString participationType = "PT_ACTIVE";
+CString snapshotType = "active";
+string message;
+
+
+void AvayaCtiUI::OnBnClickedLoginBtn()
+{
+	// TODO: Agent login 
+	CString loginId,deviceId;
+	GetDlgItem(IDC_AGENT_EDIT)->GetWindowTextA(loginId);
+	GetDlgItem(IDC_DEVICE_EDIT)->GetWindowTextA(deviceId);
+
+	message = "{ \"method\":\"AgentLogin\",\"DeviceID\" : \"" + deviceId + "\",\"AgentID\" : \"" + loginId + "\",\"AgentPassword\": \"\",\"WorkMode\": \"" + workmode + "\" }";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	//SelectTSAPIInterface(message);
+	//MessageBox(loginId, _T("程序运行结果"), MB_OK);
+	loginId.ReleaseBuffer();
+	deviceId.ReleaseBuffer();
+	
+}
+void AvayaCtiUI::OnBnClickedLogoutBtn()
+{
+	// TODO: Agent logout
+	CString loginId, deviceId;
+	GetDlgItem(IDC_AGENT_EDIT)->GetWindowTextA(loginId);
+	GetDlgItem(IDC_DEVICE_EDIT)->GetWindowTextA(deviceId);
+
+	message = "{\"method\":\"AgentLogout\", \"DeviceID\" : \"" + deviceId + "\", \"AgentID\" : \"" + loginId + "\", \"AgentPassword\" : \"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	//SelectTSAPIInterface(message);
+	loginId.ReleaseBuffer();
+	deviceId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedRadioBtnGroup1()
+{
+	// TODO: set work mode
+	UpdateData(true);
+	switch (m_radioBtnGroup1)
+	{
+	case 0://auto in	
+		workmode = "3";
+		MessageBox("3");
+		break;
+	case 1://manual in
+		workmode = "4";
+		MessageBox("4");
+		break;
+	}
+}
+
+void AvayaCtiUI::OnBnClickedRadioBtnGroup2()
+{
+	// TODO: set agent mode
+	UpdateData(true);
+	switch (m_radioBtnGroup2)
+	{
+	case 0://agent not ready
+		agentmode = "Not Ready";
+		MessageBox("Not Ready");
+		break;
+	case 1://agent ready
+		agentmode = "Ready";
+		MessageBox("Ready");
+		break;
+	case 2://agent work not ready(busy)
+		agentmode = "Busy";
+		MessageBox("Busy");
+		break;
+	}
+}
+
+void AvayaCtiUI::OnBnClickedRadioBtnGroup3()
+{
+	// TODO: set work mode
+	UpdateData(true);
+	switch (m_radioBtnGroup3)
+	{
+	case 0://auto in	
+		participationType = "PT_ACTIVE";
+		MessageBox("PT_ACTIVE");
+		break;
+	case 1://manual in
+		participationType = "PT_SILENT";
+		MessageBox("PT_SILENT");
+		break;
+	}
+}
+
+void AvayaCtiUI::OnBnClickedRadioBtnGroup4()
+{
+	// TODO: set work mode
+	UpdateData(true);
+	switch (m_radioBtnGroup4)
+	{
+	case 0://auto in	
+		snapshotType = "active";
+		MessageBox("GET Active ConnectionID");
+		break;
+	case 1://manual in
+		snapshotType = "hold";
+		MessageBox("GET HOLD ConnectionID");
+		break;
+	}
+}
+
+
+void AvayaCtiUI::OnBnClickedStateChangeBtn()
+{
+	// TODO: change agent mode
+	CString agentId, deviceId;
+	GetDlgItem(IDC_AGENT_EDIT2)->GetWindowTextA(agentId);
+	GetDlgItem(IDC_DEVICE_EDIT2)->GetWindowTextA(deviceId);
+
+	message = "{ \"method\":\"AgentSetState\",\"DeviceID\":\""+deviceId+"\",\"AgentID\":\""+agentId+"\",\"AgentPassword\":\"\",\"agentState\":\""+agentmode+"\",\"enablePending\":\"1\",\"WorkMode\":\""+workmode+"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	//SelectTSAPIInterface(message);
+	agentId.ReleaseBuffer();
+	deviceId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedChkstateBtn()
+{
+	// TODO: check agent state
+	CString deviceId;
+	GetDlgItem(IDC_DEVICE_EDIT2)->GetWindowTextA(deviceId);
+
+	message = "{\"method\":\"AgentGetState\",\"DeviceID\":\""+deviceId+"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedCallBtn()
+{
+	// TODO: make call
+	CString callingDevice, calledDevice;
+	GetDlgItem(IDC_CALLINGDEVICE_EDIT)->GetWindowTextA(callingDevice);
+	GetDlgItem(IDC_CALLEDDEVICE_EDIT)->GetWindowTextA(calledDevice);
+
+	message = "{\"method\":\"AgentMakeCall\",\"callingDevice\":\""+callingDevice +"\",\"calledDevice\":\""+ calledDevice +"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	callingDevice.ReleaseBuffer();
+	calledDevice.ReleaseBuffer();
+
+}
+
+
+void AvayaCtiUI::OnBnClickedMonitorStartBtn()
+{
+	// TODO: start device monitor
+	CString deviceId;
+	GetDlgItem(IDC_DEVICE_EDIT3)->GetWindowTextA(deviceId);
+
+	message = "{\"method\":\"AgentStartMonitor\",\"DeviceID\":\""+deviceId+"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedMonitorStopBtn()
+{
+	// TODO: stop device monitor
+	CString deviceId;
+	GetDlgItem(IDC_DEVICE_EDIT3)->GetWindowTextA(deviceId);
+
+	message = "{\"method\":\"AgentStopMonitor\",\"MonitorCrossRefID\":\""+deviceId+"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedAnswerBtn()
+{
+	// TODO: answer call
+	CString deviceId, callId;
+	GetDlgItem(IDC_DEVICE_EDIT4)->GetWindowTextA(deviceId);
+	GetDlgItem(IDC_CALLID_EDIT)->GetWindowTextA(callId);
+
+	message = "{\"method\":\"AgentAnswerCall\",\"DeviceID\":\""+deviceId+"\",\"callID\":\""+callId+"\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+	callId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedClearconBtn()
+{
+	// TODO: clear connection
+	CString deviceId, callId;
+	GetDlgItem(IDC_DEVICE_EDIT5)->GetWindowTextA(deviceId);
+	GetDlgItem(IDC_CALLID_EDIT2)->GetWindowTextA(callId);
+
+	message = "{\"method\":\"AgentClearConnection\",\"DeviceID\":\"" + deviceId + "\",\"callID\":\"" + callId + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+	callId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedHoldBtn()
+{
+	// TODO: hold call
+	CString deviceId, callId;
+	GetDlgItem(IDC_DEVICE_EDIT6)->GetWindowTextA(deviceId);
+	GetDlgItem(IDC_CALLID_EDIT3)->GetWindowTextA(callId);
+
+	message = "{\"method\":\"AgentHoldCall\",\"DeviceID\":\"" + deviceId + "\",\"callID\":\"" + callId + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+	callId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedCancelholdBtn()
+{
+	// TODO: cancel hold (RetrieveCall)
+	CString deviceId, callId;
+	GetDlgItem(IDC_DEVICE_EDIT7)->GetWindowTextA(deviceId);
+	GetDlgItem(IDC_CALLID_EDIT4)->GetWindowTextA(callId);
+
+	message = "{\"method\":\"AgentRetrieveCall\",\"DeviceID\":\"" + deviceId + "\",\"callID\":\"" + callId + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+	callId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedPickupBtn()
+{
+	// TODO: pick up
+	CString deviceId, callId, calledDevice;
+	GetDlgItem(IDC_DEVICE_EDIT8)->GetWindowTextA(deviceId);
+	GetDlgItem(IDC_CALLID_EDIT5)->GetWindowTextA(callId);
+	GetDlgItem(IDC_CALLEDDEVICE_EDIT2)->GetWindowTextA(calledDevice);
+
+	message = "{\"method\":\"AgentPickupCall\",\"DeviceID\":\"" + deviceId + "\",\"activeCall\":\"" + callId + "\",\"calledDevice\":\"" + calledDevice + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+	callId.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedMonitorcallbtn()
+{
+	// TODO: Monitor Call
+	CString deviceId, checkedDevice,callId;
+	GetDlgItem(IDC_DEVICE_EDIT9)->GetWindowTextA(checkedDevice);
+	GetDlgItem(IDC_DEVICE_EDIT10)->GetWindowTextA(deviceId);
+	
+	
+	message = "{\"method\":\"AgentMonitorCall\",\"DeviceID\":\"" + deviceId + "\",\"CheckedDevice\":\"" + checkedDevice + "\",\"ParticipationType\":\"" + participationType + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	deviceId.ReleaseBuffer();
+	checkedDevice.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedSnapshotBtn()
+{
+	// TODO: snapshout connection info
+	CString  checkedDevice;
+	GetDlgItem(IDC_DEVICE_EDIT9)->GetWindowTextA(checkedDevice);
+	message = "{\"method\":\"SnapshotDevice\",\"CheckedDevice\":\"" + checkedDevice + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	checkedDevice.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedConsultBtn()
+{
+	// TODO: 
+	CString deviceId, calledDevice;
+	GetDlgItem(IDC_CALLEDDEVICE_EDIT3)->GetWindowTextA(calledDevice);
+	GetDlgItem(IDC_DEVICE_EDIT12)->GetWindowTextA(deviceId);
+
+	message = "{\"method\":\"AgentConsultationCall\",\"DeviceID\":\"" + deviceId + "\",\"CalledDevice\":\"" + calledDevice + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	calledDevice.ReleaseBuffer();
+
+}
+
+
+void AvayaCtiUI::OnBnClickedSnapshotBtn2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	// TODO: snapshout connection info
+	CString  checkedDevice;
+	GetDlgItem(IDC_DEVICE_EDIT12)->GetWindowTextA(checkedDevice);
+	message = "{\"method\":\"SnapshotDevice\",\"CheckedDevice\":\"" + checkedDevice + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	checkedDevice.ReleaseBuffer();
+}
+
+
+void AvayaCtiUI::OnBnClickedConfBtn()
+{
+	// TODO: conference call
+	CString deviceId, checkedDevice;
+	GetDlgItem(IDC_DEVICE_EDIT12)->GetWindowTextA(checkedDevice);
+	GetDlgItem(IDC_CALLEDDEVICE_EDIT3)->GetWindowTextA(deviceId);
+	CString type = "PT_ACTIVE";
+	if (((CButton*)GetDlgItem(IDC_CHECK1))->GetCheck()) {
+	
+
+		message = "{\"method\":\"AgentSingleStepConferenceCall\",\"CalledDevice\":\"" + deviceId + "\",\"CheckedDevice\":\"" + checkedDevice + "\",\"ParticipationType\":\"" + type + "\"}";
+		GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+		AvayaCtiUI::OnBnClickedBegin();
+		deviceId.ReleaseBuffer();
+		checkedDevice.ReleaseBuffer();
+	}
+	else {
+		message = "{\"method\":\"AgentConferenceCall\",\"CalledDevice\":\"" + deviceId + "\",\"CheckedDevice\":\"" + checkedDevice + "\",\"ParticipationType\":\"" + type + "\"}";
+		GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+		AvayaCtiUI::OnBnClickedBegin();
+		deviceId.ReleaseBuffer();
+		checkedDevice.ReleaseBuffer();
+	}
+
+	
+
+}
+
+
+void AvayaCtiUI::OnBnClickedTransferBtn()
+{
+	// TODO: transfer call
+	CString calledDevice, checkedDevice;
+	GetDlgItem(IDC_DEVICE_EDIT12)->GetWindowTextA(checkedDevice);
+	GetDlgItem(IDC_CALLEDDEVICE_EDIT3)->GetWindowTextA(calledDevice);
+
+	message = "{\"method\":\"AgentSingleStepTransferCall\",\"CalledDevice\":\"" + calledDevice + "\",\"CheckedDevice\":\"" + checkedDevice + "\"}";
+	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
+	AvayaCtiUI::OnBnClickedBegin();
+	calledDevice.ReleaseBuffer();
+	checkedDevice.ReleaseBuffer();
+
+}
+
+
 
 void AvayaCtiUI::OnBnClickedRoutingInsert()
 {
@@ -381,3 +780,4 @@ void AvayaCtiUI::OnBnClickedRoutingSelect()
 {
 
 }
+

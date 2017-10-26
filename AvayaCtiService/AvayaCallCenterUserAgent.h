@@ -50,17 +50,21 @@ public:
 	void AgentTransferCall(DeviceID_t D1, long C1, long C2);//电话转移（已接）（成功转）
 
 	//This function is used to Conference the Call
-	void AgentConferenceCall(DeviceID_t D1, long C1, long C2);//三方通话
+	void AgentConferenceCall(DeviceID_t D1, DeviceID_t D2);//三方通话
 	//单步电话会议 //未写
 	//This function is used to Consultation the Call
-	void AgentConsultationCall(DeviceID_t D1, long C1, DeviceID_t D3);//两方求助电话
+	void AgentConsultationCall(DeviceID_t D1, DeviceID_t D3);//两方求助电话
 	//This function is used to Reconnect the Call  
 	//activeCall (C2- D1)   heldCall (C1- D1)
 	void AgentReconnectCall(DeviceID_t D1, long C1, long C2);
 	//通话监听
 	//snapshot get the callid
 	//single step conference(slient)
-	void AgentMonitorCall(DeviceID_t deviceID, DeviceID_t checkedDevice);
+	void AgentMonitorCall(DeviceID_t deviceID, DeviceID_t checkedDevice,string type);
+
+	void SnapshotDevice(DeviceID_t checkedDevice);
+	//单步转移、强接
+	void AgentSingleStepTransferCall(DeviceID_t calledDevice, DeviceID_t checkedDevice);
 	//从两方求助状态重连电话
 
 	// This funcion is used to Query the Agent State

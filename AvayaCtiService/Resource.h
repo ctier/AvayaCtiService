@@ -66,6 +66,7 @@
 #define IDC_ANSWER_BTN                  1055
 #define IDC_CALLEDDEVICE_EDIT2          1056
 #define IDC_QUALITY_GRO                 1057
+#define IDC_CDServer_GRO                1058
 #define IDC_MonitorCall_btn             1059
 #define IDC_DeviceID_LB5                1060
 #define IDC_DEVICE_EDIT5                1061
@@ -88,23 +89,38 @@
 #define IDC_CALLID_EDIT5                1078
 #define IDC_PICKUP_BTN                  1079
 #define IDC_DeviceID_LB9                1080
-#define IDC_ROUTING_GRO                 1081
+#define IDC_SNAPSHOT_BTN                1081
 #define IDC_DEVICE_EDIT9                1082
 #define IDC_DeviceID_LB10               1083
 #define IDC_DEVICE_EDIT10               1084
-#define IDC_BLAKLIST_LB                 1085
-#define IDC_ROUTING_EDIT1               1086
-#define IDC_ROUTING_INSERT              1088
-#define IDC_BUTTON3                     1089
-#define IDC_ROUTING_DELETE              1089
-
+#define IDC_PARTICIPATIONTYPE_RADIO1    1085
+#define IDC_PARTICIPATIONTYPE_RADIO2    1086
+#define IDC_Monitor_GRO2                1087
+#define IDC_ACTIVE_RADIO                1088
+#define IDC_DeviceID_LB12               1089
+#define IDC_CALLEDDEVICE_EDIT3          1090
+#define IDC_CONSULT_BTN                 1091
+#define IDC_DeviceID_LB13               1092
+#define IDC_DEVICE_EDIT12               1093
+#define IDC_SNAPSHOT_BTN2               1094
+#define IDC_CONF_BTN                    1095
+#define IDC_TRANSFER_BTN                1096
+#define IDC_HELD_RADIO                  1097
+#define IDC_CHECK1                      1098
+#define IDC_CHECK2                      1099
+#define IDC_BLAKLIST_LB                 1100
+#define IDC_ROUTING_EDIT1               1101
+#define IDC_ROUTING_INSERT              1102
+#define IDC_BUTTON3                     1103
+#define IDC_ROUTING_DELETE              1104
+#define IDC_ROUTING_GRO                 1105
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        318
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1090
+#define _APS_NEXT_CONTROL_VALUE         1099
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif
