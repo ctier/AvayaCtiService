@@ -329,6 +329,7 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 	string DeviceID = m_InvokeID2DeviceID[cstaEvent.event.cstaConfirmation.invokeID];
 	mes["ActName"] = ActName;
 	mes["DeviceID"] = DeviceID;
+	mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
 
 	switch (cstaEvent.eventHeader.eventType)
 	{
@@ -358,6 +359,7 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 		// 向DeviceID传递事件成功消息
 		if (ActName == "AgentLogin" || ActName == "AgentLogout"|| ActName == "AgentSetState")
 		{
+			//cstaEvent.event.cstaConfirmation.u.setAgentState.null
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());//本地打印 
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);//向DeviceID对应的kafka分支发送消息
@@ -545,7 +547,6 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 		// talkState is used.
 
 		ATTEvent_t att_event ; // used for reteriving the current Talk State of Agent
-
 		// Check the Agent's State
 		switch (agentState)
 		{
@@ -807,6 +808,8 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 	string DeviceID;//事件返回的设备ID
 
 	WORD usCallID = 0;
+	mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
+
 	switch(cstaEvent.eventHeader.eventType)
 	{
 
@@ -961,6 +964,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		mes["called_devID"] = called_devID;
 		mes["calling_devID"] = calling_devID;
 		mes["callID"] = to_string(callID);
+		//mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
 
 		DeviceID = called_devID;
 		res = ReturnMes(mes);

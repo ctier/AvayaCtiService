@@ -41,6 +41,8 @@ public:
 
 	virtual BOOL OnInitDialog();
 
+	string GetTimeStr();//GetLocalTime  
+
 	CString m_strAgentStatus;
 private:
 	void MonitoringKafka();
@@ -49,7 +51,6 @@ private:
 	CEdit m_Status;
 	void InitializeDialog();
 	void UpdataViewStatus(string);
-	string GetTimeStr();//GetLocalTime  
 
 public:
 	DECLARE_MESSAGE_MAP()

@@ -22,6 +22,7 @@ bool StatusRecord::init()
 	int port = 3306;
 	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
 
+	//来话记录表  //Delivered Event  电话送递事件
 	CallProcessList.push_back("ID");//主键
 	CallProcessList.push_back("CALLID");//呼叫ID
 	CallProcessList.push_back("CALLER");//主叫号码
@@ -29,18 +30,21 @@ bool StatusRecord::init()
 	CallProcessList.push_back("STATE");//所在状态
 	CallProcessList.push_back("TIME");//时间
 
+	//座席状态记录表  //CSTAQueryAgentStateConfEvent 查询坐席状态返回事件 
 	AgentSateList.push_back("ID");//主键
 	AgentSateList.push_back("AGENTID");//路由id
 	AgentSateList.push_back("STATION");//分机号
 	AgentSateList.push_back("STATE");//所在状态
 	AgentSateList.push_back("TIME");//时间
 
+	//话机状态记录表  //CSTAQueryAgentStateConfEvent 查询坐席状态返回事件 
 	StationSateList.push_back("ID");//主键
 	StationSateList.push_back("AGENTID");//路由id
 	StationSateList.push_back("STATION");//分机号
 	StationSateList.push_back("STATE");//所在状态
 	StationSateList.push_back("TIME");//时间
 
+	//通话状态记录表
 	CallStationList.push_back("ID");//主键
 	CallStationList.push_back("CALLID");//呼叫id
 	CallStationList.push_back("CALLER");//路由id
@@ -79,6 +83,44 @@ bool StatusRecord::GetTableList(const string& table, vector<string>& tablelist)
 	else
 		return FALSE;
 	return TRUE;
+}
+
+string StatusRecord::Request(const string& table, const string& mothed, map<string, string>& message)
+{
+	vector<string> data;
+	//
+	data.push_back("");//ID
+	if (table == "Callprocess")
+	{
+		data.push_back(message["callID"]);//呼叫ID
+		data.push_back(message["calling_devID"]);//主叫号码
+		data.push_back(message["called_devID"]);//被叫号码
+		data.push_back(message["localConnectionInfo"]);//所在状态
+		data.push_back(message["time"]);//时间
+	}
+	else if (table == "Agentstate")//
+	{
+		data.push_back(message["AgentID"]);//路由ID ？ 现在没加 可以再增添映射关系m_InvokeID2AgentID 或 m_DeviceID2AgentID
+		data.push_back(message["DeviceID"]);//分机号
+		data.push_back(message["AgentState"]);//所在状态
+		data.push_back(message["time"]);//时间
+	}
+	else if (table == "Stationstate")
+	{
+		data.push_back(message["AgentID"]);//路由ID ？ 现在没加 可以再增添映射关系m_InvokeID2AgentID 或 m_DeviceID2AgentID
+		data.push_back(message["DeviceID"]);//分机号
+		data.push_back(message["TalkState"]);//所在状态
+		data.push_back(message["time"]);//时间
+	}
+	else if (table == "Callstate")
+	{
+
+	}
+	else
+	{
+		return "Table name is wrong.";
+	}
+	return Request(table, mothed, data);
 }
 
 string StatusRecord::Request(const string& table, const string& mothed, vector<string>& data)
