@@ -54,38 +54,38 @@ void AvayaCallCenterRouting::RouteSelectInv(RouteRegisterReqID_t routeRegisterRe
 string AvayaCallCenterRouting::InsertNumber(const char *telephonenumber,const char *type)
 {
 	//,'ADDTIME'
-	string Query = "INSERT INTO NUMBERLIST('NUMBER','TYPE') VALUES('";
-	Query += telephonenumber;
-	Query += "','";
-	Query += type;
-	Query += "')";
-	return m_pMySQLInterface->Insert(Query);
+	string Request = "INSERT INTO NUMBERLIST('NUMBER','TYPE') VALUES('";
+	Request += telephonenumber;
+	Request += "','";
+	Request += type;
+	Request += "')";
+	return m_pMySQLInterface->Insert(Request);
 }
 
 string AvayaCallCenterRouting::DeleteNumber(const char *telephonenumber)
 {
-	string Query = "DELETE FROM NUMBERLIST WHERE NUMBER = '";
-	Query += telephonenumber;
-	Query += "'";
-	return m_pMySQLInterface->Delete(Query);
+	string Request = "DELETE FROM NUMBERLIST WHERE NUMBER = '";
+	Request += telephonenumber;
+	Request += "'";
+	return m_pMySQLInterface->Delete(Request);
 }
 
 string AvayaCallCenterRouting::UpdataNumber(const char *telephonenumber, const char *type)
 {
-	string Query = "UPDATE NUMBERLIST SET TYPE = '";
-	Query += type;
-	Query += "' WHERE NUMBER = '";
-	Query += telephonenumber;
-	Query += "'";
-	return m_pMySQLInterface->Updata(Query);
+	string Request = "UPDATE NUMBERLIST SET TYPE = '";
+	Request += type;
+	Request += "' WHERE NUMBER = '";
+	Request += telephonenumber;
+	Request += "'";
+	return m_pMySQLInterface->Updata(Request);
 }
 
 string AvayaCallCenterRouting::SelectNumber(const char *telephonenumber, vector<string>& data)
 {
-	string Query = "SELECT * FROM NUMBERLIST WHERE NUMBER = '";
-	Query += telephonenumber;
-	Query += "'";
-	return m_pMySQLInterface->SelectOneLine(Query, data);
+	string Request = "SELECT * FROM NUMBERLIST WHERE NUMBER = '";
+	Request += telephonenumber;
+	Request += "'";
+	return m_pMySQLInterface->SelectOneLine(Request, data);
 }
 
 void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData)

@@ -38,14 +38,14 @@ public:
 	string Open();  // 打开连接  
 	void Close(); // 关闭连接  
 
-	string Select(const string& Querystr, vector<vector<string> >& data);  // 读取数据  
-	string SelectOneLine(const string& Querystr, vector<string>& data);    // 读取一行数据 UQ键值
-	string SelectList(const string& Querystr, vector<string>& data);       // 获取数据列表
+	string Select(const string& Request, vector<vector<string> >& data);  // 读取数据  
+	string SelectOneLine(const string& Request, vector<string>& data);    // 读取一行数据 UQ键值
+	string SelectList(const string& Request, vector<string>& data);       // 获取数据列表
 
-	string Query(const string& Querystr);     // 其他操作  
-	string Insert(const string& Querystr);
-	string Delete(const string& Querystr);
-	string Updata(const string& Querystr);
+	string Query(const string& Request);     // 其他操作  
+	string Insert(const string& Request);
+	string Delete(const string& Request);
+	string Updata(const string& Request);
 
 	string ErrorIntoMySQL();     // 错误消息  
 

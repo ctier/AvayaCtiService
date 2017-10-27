@@ -72,10 +72,10 @@ void MySQLInterface::Close()
 }
 
 //读取数据
-string MySQLInterface::Select(const std::string& Querystr, std::vector<std::vector<std::string> >& data)
+string MySQLInterface::Select(const std::string& Request, std::vector<std::vector<std::string> >& data)
 {
 	string res = "Select Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(),(unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(),(unsigned int)Request.size()))
 	{
 		return ErrorIntoMySQL();
 	}
@@ -121,10 +121,10 @@ string MySQLInterface::Select(const std::string& Querystr, std::vector<std::vect
 	return res;
 }
 //读取数据列表 一行/多行？
-string MySQLInterface::SelectList(const string& Querystr, vector<string>& data)
+string MySQLInterface::SelectList(const string& Request, vector<string>& data)
 {
 	string res = "SelectList Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(), (unsigned int)Request.size()))
 	{
 		return ErrorIntoMySQL();
 	}
@@ -151,10 +151,10 @@ string MySQLInterface::SelectList(const string& Querystr, vector<string>& data)
 	return res;
 }
 // 读取一行数据
-string MySQLInterface::SelectOneLine(const string& Querystr, vector<string>& data)
+string MySQLInterface::SelectOneLine(const string& Request, vector<string>& data)
 {
 	string res = "Select Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(), (unsigned int)Request.size()))
 	{
 		return ErrorIntoMySQL();
 	}
@@ -169,6 +169,7 @@ string MySQLInterface::SelectOneLine(const string& Querystr, vector<string>& dat
 	line = mysql_fetch_row(Result);
 
 	string temp;
+	data.clear();
 	vector<string>().swap(data);
 
 	if (Result)
@@ -200,35 +201,35 @@ string MySQLInterface::SelectOneLine(const string& Querystr, vector<string>& dat
 	return res;
 }
 // 其他操作
-string MySQLInterface::Query(const std::string& Querystr)
+string MySQLInterface::Query(const std::string& Request)
 {
 	string res = "Query Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(),(unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(),(unsigned int)Request.size()))
 		return ErrorIntoMySQL();
 	return res;
 
 }
 
-string MySQLInterface::Insert(const string& Querystr)
+string MySQLInterface::Insert(const string& Request)
 {
 	string res = "Insert Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(), (unsigned int)Request.size()))
 		return ErrorIntoMySQL();
 	return res;
 }
 
-string MySQLInterface::Delete(const string& Querystr)
+string MySQLInterface::Delete(const string& Request)
 {
 	string res = "Delete Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(), (unsigned int)Request.size()))
 		return ErrorIntoMySQL();
 	return res;
 }
 
-string MySQLInterface::Updata(const string& Querystr)
+string MySQLInterface::Updata(const string& Request)
 {
 	string res = "Updata Successful.";
-	if (mysql_real_query(&MysqlInstance, Querystr.c_str(), (unsigned int)Querystr.size()))
+	if (mysql_real_query(&MysqlInstance, Request.c_str(), (unsigned int)Request.size()))
 		return ErrorIntoMySQL();
 	return res;
 }
