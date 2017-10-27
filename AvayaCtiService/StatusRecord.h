@@ -1,7 +1,7 @@
 // StatusRecord  
 
 // 功能描述：实现对ctidb库表Callprocess Agentstate Stationstate Callstate访问操作的封装   
-
+// 开放Request接口 res = Request("CALLPROCESS","INSERT",);
 #ifndef __STATUS_RECORD_H__    
 #define __STATUS_RECORD_H__    
 
@@ -16,7 +16,7 @@ public:
 	StatusRecord();
 	virtual ~StatusRecord();
 
-	string Query(const string& table,const string& mothed, vector<string>& data);
+	string Request(const string& table,const string& mothed, vector<string>& data);
 
 private:
 	//This object will contain the MySQLInterface Object
@@ -24,8 +24,8 @@ private:
 
 	vector<string> CallProcessList;
 	vector<string> AgentSateList;
-	vector<string> CallStationList;
 	vector<string> StationSateList;
+	vector<string> CallStationList;
 
 private:
 	bool init();

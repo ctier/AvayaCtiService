@@ -180,6 +180,34 @@ void AvayaCtiUI::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ROUTING_TYPE, m_cbRoutingType);
 }
 
+string AvayaCtiUI::GetTimeStr()//GetLocalTime  
+
+{
+	SYSTEMTIME time;
+
+	GetLocalTime(&time);
+
+	string year;
+	string month;
+	string day;
+
+	year = to_string(time.wYear);
+	month = to_string(time.wMonth);
+	day = to_string(time.wDay);
+	string strTime = year + "/" + month + "/" + day + " ";
+
+	char* pTime = new char[30];
+	string strFormat = "HH:mm:ss";
+	GetTimeFormat(LOCALE_INVARIANT, LOCALE_USE_CP_ACP, &time, strFormat.c_str(), (LPSTR)pTime, 30);
+	strTime += pTime;
+
+	string milliseconds;
+	milliseconds = to_string(time.wMilliseconds);
+	strTime += "." + milliseconds;
+
+	return strTime;
+}
+
 void AvayaCtiUI::MonitoringKafka()
 {
 	/*

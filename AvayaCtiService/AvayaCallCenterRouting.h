@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sys/timeb.h>
 #include "MySQLInterface.h"
 #include "TSAPIInterface.h"
 
@@ -15,6 +16,7 @@ private:
 	// This object will contain the TSAPIInterface Object
 	TSAPIInterface *m_pTsapiInterfaceObject;
 
+	timeb time;
 	//vector<string> selectline;
 	//string Querystr;
 

@@ -22,6 +22,33 @@ bool StatusRecord::init()
 	int port = 3306;
 	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
 
+	CallProcessList.push_back("ID");//主键
+	CallProcessList.push_back("CALLID");//呼叫ID
+	CallProcessList.push_back("CALLER");//主叫号码
+	CallProcessList.push_back("CALLED");//被叫号码
+	CallProcessList.push_back("STATE");//所在状态
+	CallProcessList.push_back("TIME");//时间
+
+	AgentSateList.push_back("ID");//主键
+	AgentSateList.push_back("AGENTID");//路由id
+	AgentSateList.push_back("STATION");//分机号
+	AgentSateList.push_back("STATE");//所在状态
+	AgentSateList.push_back("TIME");//时间
+
+	StationSateList.push_back("ID");//主键
+	StationSateList.push_back("AGENTID");//路由id
+	StationSateList.push_back("STATION");//分机号
+	StationSateList.push_back("STATE");//所在状态
+	StationSateList.push_back("TIME");//时间
+
+	CallStationList.push_back("ID");//主键
+	CallStationList.push_back("CALLID");//呼叫id
+	CallStationList.push_back("CALLER");//路由id
+	CallStationList.push_back("STATION");//分机号
+	CallStationList.push_back("STATE");//所在状态
+	CallStationList.push_back("TIME");//时间
+
+
 	return TRUE;
 }
 
@@ -54,7 +81,7 @@ bool StatusRecord::GetTableList(const string& table, vector<string>& tablelist)
 	return TRUE;
 }
 
-string StatusRecord::Query(const string& table, const string& mothed, vector<string>& data)
+string StatusRecord::Request(const string& table, const string& mothed, vector<string>& data)
 {
 	string ret;
 	vector<string> tablelist;

@@ -19,6 +19,7 @@ bool AvayaCallCenterRouting::init()
 	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
 	// get the TSAPIInterface Object
 	m_pTsapiInterfaceObject = TSAPIInterface::GetInstance();
+
 	return true;
 }
 
@@ -193,3 +194,4 @@ void AvayaCallCenterRouting::RouteUsedExtEvent(CSTARouteUsedExtEvent_t routeUsed
 	//写入数据库  发送监控
 
 }
+

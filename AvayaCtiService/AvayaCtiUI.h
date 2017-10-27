@@ -49,6 +49,7 @@ private:
 	CEdit m_Status;
 	void InitializeDialog();
 	void UpdataViewStatus(string);
+	string GetTimeStr();//GetLocalTime  
 
 public:
 	DECLARE_MESSAGE_MAP()
