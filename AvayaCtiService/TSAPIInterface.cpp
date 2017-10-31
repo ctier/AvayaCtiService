@@ -22,7 +22,7 @@ IMPLEMENT_DYNAMIC(TSAPIInterface, CWnd)
 
 // Constructor of the TSAPIInterface 
 // initialising the Default Values
-TSAPIInterface::TSAPIInterface()
+TSAPIInterface::TSAPIInterface()//:m_DeviceID2AgentID(3)
 {
 	m_lAcsHandle = 0; // handle for the ACS stream
 	
@@ -357,14 +357,22 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 	{
 		// Get the Agent State to take appropriate Action.	
 		// 向DeviceID传递事件成功消息
+
 		if (ActName == "AgentLogin" || ActName == "AgentLogout"|| ActName == "AgentSetState")
 		{
+			//string deviceID = 
+			mes["AgentState"] = m_Device2AgentMode[DeviceID];//  AgentMode
+			mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+
 			//cstaEvent.event.cstaConfirmation.u.setAgentState.null
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());//本地打印 
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);//向DeviceID对应的kafka分支发送消息
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到座席状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Agentsate", "Insert", mes);
 		}
 
 	}break;
@@ -632,6 +640,9 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 			}
 		}break;
 		}// end of switch
+		//记录到座席状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Agentsate", "Insert", mes);
+
 	}// end of Query Agent State
 	break;
 	case CSTA_SNAPSHOT_DEVICE_CONF:
@@ -965,8 +976,13 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		mes["calling_devID"] = calling_devID;
 		mes["callID"] = to_string(callID);
 		//mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
-
 		DeviceID = called_devID;
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+
+		//保存到来话记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess","Insert", mes);
+		//保存到通话状态记录表
+
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
@@ -1335,6 +1351,8 @@ bool TSAPIInterface::AgentLogin(DeviceID_t deviceID, AgentID_t agentID, AgentPas
 		//binding InvokeID_t and deviceID,ActName
 		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;//(int)atoi()
 		m_InvokeID2ActName[m_ulInvokeID] = "AgentLogin";
+		m_DeviceID2AgentID[deviceID] = agentID;
+		m_Device2AgentMode[deviceID] = agentMode;
 
 		if ( m_nRetCode < 0 )
 		{
@@ -1372,6 +1390,8 @@ bool TSAPIInterface::AgentLogout(DeviceID_t deviceID, AgentID_t agentID, AgentPa
 
 	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
 	m_InvokeID2ActName[m_ulInvokeID] = "AgentLogout";
+	m_DeviceID2AgentID.erase(deviceID);
+	m_Device2AgentMode[deviceID] = agentMode;
 
 	if ( m_nRetCode < 0 )
 	{
@@ -1495,6 +1515,7 @@ void TSAPIInterface::AgentSetState(DeviceID_t deviceID,AgentID_t agentID, AgentP
 	//m_nAgtStateChangeInvokeID = m_ulInvokeID;
 	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
 	m_InvokeID2ActName[m_ulInvokeID] = "AgentSetState";
+	m_Device2AgentMode[deviceID] = agtMode;
 }
 
 

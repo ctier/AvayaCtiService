@@ -84,6 +84,14 @@ BOOL AvayaCtiUI::OnInitDialog()
 		return FALSE;
 	}
 	
+	//创建StatusRecord对象
+	 m_pStatusRecordObject = new StatusRecord();
+	 if (m_pStatusRecordObject == NULL)
+	 {
+		 return FALSE;
+	 }
+
+
 	HINSTANCE hInst = AfxGetInstanceHandle();
 	char szFileName[MAX_PATH];
 	GetModuleFileName(hInst, szFileName, MAX_PATH);

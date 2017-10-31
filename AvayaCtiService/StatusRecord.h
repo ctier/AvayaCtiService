@@ -16,8 +16,9 @@ public:
 	StatusRecord();
 	virtual ~StatusRecord();
 
-	string Request(const string& table,const string& mothed, vector<string>& data);
-	string Request(const string& table, const string& mothed, map<string, string>& message);//根据操作的表，将事件返回信息装入vector
+	string Request(const string& table,const string& mothed, vector<string>& data);//只有查询操作把查询到的信息保存到了data
+	string Request(const string& table, const string& mothed, map<string, string>& message);//操作请求
+	string Request(const string& table, const string& mothed, map<string, string>& message, vector<string>& data);//操作请求，将事件返回信息装入vector
 private:
 	//This object will contain the MySQLInterface Object
 	MySQLInterface *m_pMySQLInterface;
