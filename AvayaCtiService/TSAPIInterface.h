@@ -159,10 +159,12 @@ private :
 	map<InvokeID_t, string> m_InvokeID2DeviceID;//绑定请求ID与请求分机号
 	map<InvokeID_t, string> m_InvokeID2ActName;//绑定请求ID与操作名
 	
-	map<string, string> m_DeviceID2AgentID;//绑定分机号与路由ID  //暂时不管请求失败 ？
-	//vector<vector<string>> m_DeviceID2AgentID;//绑定分机号与路由ID ,第三列未确认绑定是否成功的确认参数
+	map<string, string> m_DeviceID2AgentID;//只用于登陆 登出
+	map<string, string> m_DeviceID2AgentMode;//只用于AgentSetState
+	map<string, string> m_DeviceID2CallID;
+	map<string, string> m_DeviceID2TalkState;
+	map<string, string> m_DeviceID2station;//1：开始2：结束	3：保持	4：取消保持	5：转移 6：三方 7：组呼
 
-	map<string, string> m_Device2AgentMode;//只用于AgentSetState
 
 	map<string, ConnectionID_t> m_activeCall;//设备的正在通话的connectionID
 	map<string, ConnectionID_t> m_heldCall;//设备正在保持的connectionID

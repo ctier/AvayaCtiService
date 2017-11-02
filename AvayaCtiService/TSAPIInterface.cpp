@@ -330,6 +330,8 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 	mes["ActName"] = ActName;
 	mes["DeviceID"] = DeviceID;
 	mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
+	mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+	
 
 	switch (cstaEvent.eventHeader.eventType)
 	{
@@ -360,9 +362,8 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 
 		if (ActName == "AgentLogin" || ActName == "AgentLogout"|| ActName == "AgentSetState")
 		{
-			//string deviceID = 
-			mes["AgentState"] = m_Device2AgentMode[DeviceID];//  AgentMode
-			mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+			mes["AgentState"] = m_DeviceID2AgentMode[DeviceID];//  AgentMode
+
 
 			//cstaEvent.event.cstaConfirmation.u.setAgentState.null
 			res = ReturnMes(mes);
@@ -383,11 +384,22 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 		// 向DeviceID传递事件成功消息
 		if (ActName == "AgentAnswerCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
 		}
 
 	}break;
@@ -396,66 +408,124 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 		// 向DeviceID传递事件成功消息
 		if (ActName == "AgentDisconnectCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
 		}
 	}break;
 	case CSTA_MAKE_CALL_CONF://呼出 AgentMakeCall
 	{
 		if (ActName == "AgentMakeCall")
 		{
+			//没有生成callID
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_HOLD_CALL_CONF://保持 AgentHoldCall
 	{
 		if (ActName == "AgentHoldCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_RETRIEVE_CALL_CONF://保持恢复 AgentRetrieveCall
 	{
 		if (ActName == "AgentRetrieveCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_DEFLECT_CALL_CONF://电话转移 AgentDeflectCall
 	{
 		if (ActName == "AgentDeflectCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_PICKUP_CALL_CONF://电话代接 AgentPickupCall
 	{
 		if (ActName == "AgentPickupCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
 		}
 	}break;
 	case CSTA_TRANSFER_CALL_CONF://电话转移 成功转
@@ -474,14 +544,24 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 				char*  ucid = att_event.u.transferCall.ucid;
 				//mes["ucid"] = ucid;
 			}
-			mes["newCall_callID"] = newCall.callID;
-			mes["newCall_deviceID"] = newCall.deviceID;
+			//mes["newCall_callID"] = newCall.callID;
+			//mes["newCall_deviceID"] = newCall.deviceID;
+			mes["callID"] = to_string(newCall.callID);
+			mes["caller"] = to_string((char)newCall.deviceID);
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
 
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
 		}
 	}break;
 	//CSTA_ESCAPE_SVC_CONF  //电话转移 释放转
@@ -500,14 +580,23 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 			{
 				char*  ucid = att_event.u.conferenceCall.ucid;
 			}
-			mes["newCall_callID"] = newCall.callID;
-			mes["newCall_deviceID"] = newCall.deviceID;
+			//mes["newCall_callID"] = newCall.callID;
+			//mes["newCall_deviceID"] = newCall.deviceID;
+			mes["callID"] = to_string(newCall.callID);
+			mes["caller"] = to_string((char)newCall.deviceID);
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
 
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_CONSULTATION_CALL_CONF://二方求助
@@ -524,25 +613,42 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 			{
 				//char*  ucid = att_event.u.conferenceCall.ucid;
 			}
-			mes["newCall_callID"] = newCall.callID;
-			mes["newCall_deviceID"] = newCall.deviceID;
+			//mes["newCall_callID"] = newCall.callID;
+			//mes["newCall_deviceID"] = newCall.deviceID;
+			mes["callID"] = to_string(newCall.callID);
+			mes["caller"] = to_string((char)newCall.deviceID);
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
 
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_RECONNECT_CALL_CONF:
 	{
 		if (ActName == "AgentReconnectCall")
 		{
+			mes["callID"] = m_DeviceID2CallID[DeviceID];
+			mes["caller"] = DeviceID;
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
+
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_QUERY_AGENT_STATE_CONF://查询坐席状态 QueryAgentStatus
@@ -690,14 +796,24 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 			ConnectionID_t newCall = att_event.u.ssconference.newCall;
 			ConnectionList_t connList = att_event.u.ssconference.connList;
 
-			mes["newCall_callID"] = to_string(newCall.callID);
-			mes["newCall_deviceID"] = to_string((char)newCall.deviceID);
+			//mes["newCall_callID"] = to_string(newCall.callID);
+			//mes["newCall_deviceID"] = to_string((char)newCall.deviceID);
+			mes["callID"] = to_string(newCall.callID);
+			mes["caller"] = to_string((char)newCall.deviceID);
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
 
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
 		}
 		if (ActName == "AgentSingleStepTransferCall")
 		{
@@ -714,14 +830,23 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 			ConnectionID_t newCall = att_event.u.ssconference.newCall;
 			ConnectionList_t connList = att_event.u.ssconference.connList;
 
-			mes["newCall_callID"] = to_string(newCall.callID);
-			mes["newCall_deviceID"] = to_string((char)newCall.deviceID);
+			//mes["newCall_callID"] = to_string(newCall.callID);
+			//mes["newCall_deviceID"] = to_string((char)newCall.deviceID);
+			mes["callID"] = to_string(newCall.callID);
+			mes["caller"] = to_string((char)newCall.deviceID);
+			mes["station"] = m_DeviceID2station[DeviceID];
+			mes["TalkState"] = m_DeviceID2TalkState[DeviceID];
 
 			res = ReturnMes(mes);
 			//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 			//m_pProducerObject->produce(res, stoi(DeviceID)%10);
 			theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 			theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+			//记录到话机状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+			//记录到通话状态记录表
+			theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 		}
 	}break;
 	case CSTA_UNIVERSAL_FAILURE_CONF :
@@ -800,6 +925,7 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 		}
 	}//end of CSTA_UNIVERSAL_FAILURE_CONF Switch
 	}// end of cstaConfirmation Switch	
+	
 	//删除map key invokeID对应映射
 	m_InvokeID2DeviceID.erase(cstaEvent.event.cstaConfirmation.invokeID);
 	m_InvokeID2ActName.erase(cstaEvent.event.cstaConfirmation.invokeID);
@@ -820,7 +946,6 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 
 	WORD usCallID = 0;
 	mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
-
 	switch(cstaEvent.eventHeader.eventType)
 	{
 
@@ -849,17 +974,27 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.originated.originatedConnection.callID;
 		char *called_devID = cstaEvent.event.cstaUnsolicited.u.originated.calledDevice.deviceID;
 		char *calling_devID = cstaEvent.event.cstaUnsolicited.u.originated.callingDevice.deviceID;
+		DeviceID = calling_devID;
 
 		//输出连接的呼叫双方
 		mes["callID"] = to_string(usCallID);
 		mes["called_devID"] = called_devID;
 		mes["calling_devID"] = calling_devID;
-		DeviceID = called_devID;
+		mes["caller"] = DeviceID;////
+		mes["station"] = "开始";
+		mes["DeviceID"] = DeviceID;
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+		mes["TalkState"] = "csConnect";
 		res = ReturnMes(mes);
 		//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 		//m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+		//记录到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+		//记录到通话状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
 	}break;
 
 	case CSTA_CONNECTION_CLEARED://Connection Cleared Event  清除连接
@@ -878,16 +1013,18 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.connectionCleared.droppedConnection.callID;
 		//char *releaseDevID = cstaEvent.event.cstaUnsolicited.u.connectionCleared.droppedConnection.deviceID;//?
 		mes["callID"] = to_string(usCallID);
-		mes["deviceID"] = to_string(*cstaEvent.event.cstaUnsolicited.u.connectionCleared.droppedConnection.deviceID);
-		DeviceID = cstaEvent.event.cstaUnsolicited.u.connectionCleared.droppedConnection.deviceID;
-		
+		//mes["DeviceID"] = to_string(*cstaEvent.event.cstaUnsolicited.u.connectionCleared.droppedConnection.deviceID);
+		char *releasingDevice = cstaEvent.event.cstaUnsolicited.u.connectionCleared.releasingDevice.deviceID;
+		DeviceID = releasingDevice;
+		mes["DeviceID"] = DeviceID;
+		mes["caller"] = DeviceID;
 		//输出清除的设备号，呼叫号和当时设备状态
 		switch (cstaEvent.event.cstaUnsolicited.u.connectionCleared.localConnectionInfo)//本地连接状态
 		{
 		case csAlerting:
 		{
 			mes["LocalConnectionState_t"] = "csAlerting";
-
+			
 		}break;// End of Alerting
 		case csConnect:
 		{
@@ -922,16 +1059,29 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		}
 
 		}
+		mes["station"] = "结束";
+		mes["TalkState"] = "csNull";
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+
 		res = ReturnMes(mes);
 		//theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 		//m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+		//记录到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+		//记录到通话状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
+
 	}break;
 	case CSTA_RETRIEVED://CSTARetrievedEvent 恢复连接事件
 	{// This event is received when held call is retrieved.
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.retrieved.retrievedConnection.callID;
 		char *retrieved_devID = cstaEvent.event.cstaUnsolicited.u.retrieved.retrievedConnection.deviceID;
+		char *retrieving_devID = cstaEvent.event.cstaUnsolicited.u.retrieved.retrievingDevice.deviceID;
+
 		//删除held map 元素
 		if (m_heldCall[to_string(*retrieved_devID)].callID > 0) {
 			m_heldCall.erase(cstaEvent.event.cstaUnsolicited.u.retrieved.retrievedConnection.deviceID);
@@ -942,12 +1092,27 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		//输出恢复连接的设备号
 		mes["callID"] = usCallID;
 		mes["retrieved_devID"] = retrieved_devID;
-		DeviceID = retrieved_devID;
+
+		
+		mes["station"] = "取消保持";
+		//DeviceID = retrieved_devID;
+		DeviceID = retrieving_devID;
+		mes["caller"] = DeviceID;
+		mes["DeviceID"] = DeviceID;
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+		mes["TalkState"] = "csConnect";
+
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+		//记录到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+		//记录到通话状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
+
 	}// end of csta Retrived Event
 	break;
 
@@ -975,19 +1140,21 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		mes["called_devID"] = called_devID;
 		mes["calling_devID"] = calling_devID;
 		mes["callID"] = to_string(callID);
-		//mes["time"] = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
-		DeviceID = called_devID;
+		//DeviceID = called_devID;
+		DeviceID = calling_devID;
+		mes["DeviceID"] = DeviceID;
 		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
-
-		//保存到来话记录表
-		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess","Insert", mes);
-		//保存到通话状态记录表
-
+		mes["TalkState"] = "csAlerting";
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+		//保存到来话记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess", "Insert", mes);
+		//保存到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
 	}// end of Delivered Event
 	break;
 
@@ -997,16 +1164,27 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		char *m_answeringdevID = cstaEvent.event.cstaUnsolicited.u.established.answeringDevice.deviceID;
 		char *m_callingDevID = cstaEvent.event.cstaUnsolicited.u.established.callingDevice.deviceID;
 		//输出 callid ，answeringdevID,callingDevID
-		DeviceID = m_answeringdevID;
+		//DeviceID = m_answeringdevID;
+		DeviceID = m_callingDevID;
+		mes["DeviceID"] = DeviceID;
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
 		mes["answeringDevice"] = m_answeringdevID;
 		mes["callingDevice"] = m_callingDevID;
 		mes["callID"] = to_string(usCallID);
-
+		mes["caller"] = m_callingDevID;
+		mes["station"] = "csConnect";
+		mes["TalkState"] = "开始";
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+	
+		//保存到来话记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess", "Insert", mes);
+		//保存到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+
 	}// end of Established Event
 		break;
 
@@ -1015,8 +1193,6 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		// update the call Manager class and update the Agent class
 		// for updates in the Agent and the Call state
 
-		// Update the CallManager
-		//分不清这几个
 		long lPrimaryCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.transferred.primaryOldCall.callID;
 		long lSecondryCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.transferred.secondaryOldCall.callID;//保留的callID
 		char *transferring_devID = cstaEvent.event.cstaUnsolicited.u.transferred.transferringDevice.deviceID;
@@ -1047,17 +1223,31 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 			mes["localConnectionInfo"] = "csConnect";
 
 		}
-		DeviceID = transferred_devID;
+		//DeviceID = transferred_devID;
+		DeviceID = transferring_devID;
 		mes["primaryOldCall"] = lPrimaryCallID;
 		mes["secondaryOldCall"] = lSecondryCallID;
 		mes["transferringDevice"] = transferring_devID;
 		mes["transferredConnections"] = transferred_devID;
 
+		mes["callID"] = to_string(lSecondryCallID);
+		mes["DeviceID"] = DeviceID;
+		mes["AgentID"] = DeviceID;
+		mes["TalkState"] = "csNull";
+		mes["caller"] = DeviceID;
+		mes["station"] = "转移";
+		
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+		//保存到来话记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess", "Insert", mes);
+		//保存到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+
 	}//end of Transferred Event
 	break;
 	case CSTA_CONFERENCED://Conferenced Event 会议开启事件
@@ -1079,16 +1269,28 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 			mes["oldCallID"] = to_string(oldCallID);
 
 		}
-		DeviceID = called_devID;
+		DeviceID = calling_devID;
+		//DeviceID = called_devID;
 		mes["called_devID"] = called_devID;
 		mes["calling_devID"] = calling_devID;
 		mes["confer_devID"] = confer_devID;
+		mes["DeviceID"] = DeviceID;
+		mes["TalkState"] = "csConnect";
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
+		mes["callID"] = mes["newCallID"];
+		mes["station"] = "组呼";
+		mes["caller"] = DeviceID;
 
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+		//保存到来话记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess", "Insert", mes);
+		//保存到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
 	}// end of Conferenced Event
 	break;
 	case CSTA_HELD :
@@ -1107,15 +1309,24 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 			mes["localConnectionInfo"] = "csHold";
 
 		}
-		DeviceID = holding_DevID;
-		mes["usCallID"] = to_string(usCallID);
-		mes["holding_DevID"] = holding_DevID;
+		mes["DeviceID"] = cstaEvent.event.cstaUnsolicited.u.held.holdingDevice.deviceID;
+		mes["AgentID"] = mes["DeviceID"];
+		mes["TalkState"] = "caHold";
+		mes["callID"] = to_string(usCallID);
+		mes["caller"] = DeviceID;
+		mes["station"] = "保持";
 
 		res = ReturnMes(mes);
 	//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus.Append(res.c_str());
 	//	m_pProducerObject->produce(res, stoi(DeviceID) % 10);
 		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
 		theApp.m_pAvayaCtiUIDlg->	UpdateData(FALSE);
+
+		//保存到来话记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callprocess", "Insert", mes);
+		//保存到话机状态记录表
+		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
+
 	}
 	break;
 	case CSTA_FAILED:
@@ -1352,7 +1563,7 @@ bool TSAPIInterface::AgentLogin(DeviceID_t deviceID, AgentID_t agentID, AgentPas
 		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;//(int)atoi()
 		m_InvokeID2ActName[m_ulInvokeID] = "AgentLogin";
 		m_DeviceID2AgentID[deviceID] = agentID;
-		m_Device2AgentMode[deviceID] = agentMode;
+		m_DeviceID2AgentMode[deviceID] = agentMode;
 
 		if ( m_nRetCode < 0 )
 		{
@@ -1391,7 +1602,7 @@ bool TSAPIInterface::AgentLogout(DeviceID_t deviceID, AgentID_t agentID, AgentPa
 	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
 	m_InvokeID2ActName[m_ulInvokeID] = "AgentLogout";
 	m_DeviceID2AgentID.erase(deviceID);
-	m_Device2AgentMode[deviceID] = agentMode;
+	m_DeviceID2AgentMode[deviceID] = agentMode;
 
 	if ( m_nRetCode < 0 )
 	{
@@ -1515,7 +1726,7 @@ void TSAPIInterface::AgentSetState(DeviceID_t deviceID,AgentID_t agentID, AgentP
 	//m_nAgtStateChangeInvokeID = m_ulInvokeID;
 	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
 	m_InvokeID2ActName[m_ulInvokeID] = "AgentSetState";
-	m_Device2AgentMode[deviceID] = agtMode;
+	m_DeviceID2AgentMode[deviceID] = agtMode;
 }
 
 
@@ -1534,8 +1745,7 @@ void TSAPIInterface ::AgentAnswerCall(DeviceID_t deviceID, long callID)
 								,(InvokeID_t)++m_ulInvokeID // application generated InvokedID
 								,(ConnectionID_t *)&m_stConnectionID // Connection Identifier
 								,NULL);					// Private Data is optional and set as NULL here
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentAnswerCall";
+
 
 	if ( m_nRetCode < 0)
 	{
@@ -1556,7 +1766,12 @@ void TSAPIInterface ::AgentAnswerCall(DeviceID_t deviceID, long callID)
 	}
 	else
 	{
-		// TSAPI Client has accepted the Request
+		string str_callID = to_string(callID);
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentAnswerCall";
+		m_DeviceID2TalkState[deviceID] = "csConnect";
+		m_DeviceID2station[deviceID] = "开始";
+		m_DeviceID2CallID[deviceID] = str_callID;
 	}
 
 }
@@ -1576,8 +1791,7 @@ void TSAPIInterface::AgentClearConnection(DeviceID_t deviceID, long callID)
 		, (InvokeID_t)++m_ulInvokeID // application generated InvokedID
 		, (ConnectionID_t *)&m_stConnectionID // Connection Identifier
 		, NULL);					// Private Data is optional and set as NULL here
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentClearConnection";
+
 
 	if (m_nRetCode < 0)
 	{
@@ -1598,7 +1812,12 @@ void TSAPIInterface::AgentClearConnection(DeviceID_t deviceID, long callID)
 	}
 	else
 	{
-		// TSAPI Client has accepted the Request
+		string str_callID = to_string(callID);
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentClearConnection";
+		m_DeviceID2TalkState[deviceID] = "csNull";
+		m_DeviceID2station[deviceID] = "结束";
+		m_DeviceID2CallID[deviceID] = str_callID;
 	}
 
 }
@@ -1619,9 +1838,6 @@ void TSAPIInterface::AgentDisconnectCall(DeviceID_t deviceID, long callID)
 									,(ConnectionID_t *)&m_stConnectionID // connection Identifier of connected call
 									,NULL); // private data is optional and is set as NULL here.
 
-	// preserve the Invoke for matching with the confirmation event.
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentDisconnectCall";
 
 	if ( m_nRetCode < 0 )
 	{
@@ -1637,7 +1853,12 @@ void TSAPIInterface::AgentDisconnectCall(DeviceID_t deviceID, long callID)
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		string str_callID = to_string(callID);
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentDisconnectCall";
+		m_DeviceID2TalkState[deviceID] = "csNull";
+		m_DeviceID2station[deviceID] = "结束";
+		m_DeviceID2CallID[deviceID] = str_callID;
 	}
 }
 
@@ -1646,14 +1867,9 @@ void TSAPIInterface::AgentMakeCall(DeviceID_t callingDevice, DeviceID_t calledDe
 {
 	m_nRetCode = cstaMakeCall(m_lAcsHandle	// handle returned by the acsOpenStream()
 		, (InvokeID_t)++m_ulInvokeID // application generated invokeID
-		//, (DeviceID_t *)&callingDevice 
-		//, (DeviceID_t *)&calledDevice 
 		, (DeviceID_t *)callingDevice
 		, (DeviceID_t *)calledDevice
 		, NULL); // private data is optional and is set as NULL here.
-
-	m_InvokeID2DeviceID[m_ulInvokeID] = callingDevice;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentMakeCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1672,7 +1888,12 @@ void TSAPIInterface::AgentMakeCall(DeviceID_t callingDevice, DeviceID_t calledDe
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		//string str_callID = to_string(callID);
+		//m_DeviceID2CallID[callingDevice] = str_callID;//返回事件中
+		m_InvokeID2DeviceID[m_ulInvokeID] = callingDevice;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentMakeCall";
+		m_DeviceID2TalkState[callingDevice] = "csInitiate";//开始
+		//m_DeviceID2station[callingDevice] = "结束";
 	}
 }
 
@@ -1689,8 +1910,6 @@ void TSAPIInterface::AgentHoldCall(DeviceID_t deviceID, long callID)
 		, true
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentHoldCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1709,7 +1928,12 @@ void TSAPIInterface::AgentHoldCall(DeviceID_t deviceID, long callID)
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		string str_callID = to_string(callID);
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentHoldCall";
+		m_DeviceID2TalkState[deviceID] = "csHold";
+		m_DeviceID2station[deviceID] = "保持";
+		m_DeviceID2CallID[deviceID] = str_callID;
 	}
 }
 
@@ -1725,8 +1949,6 @@ void TSAPIInterface::AgentRetrieveCall(DeviceID_t deviceID, long callID)//hold t
 		, (ConnectionID_t *)&m_stConnectionID
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentRetrieveCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1745,31 +1967,33 @@ void TSAPIInterface::AgentRetrieveCall(DeviceID_t deviceID, long callID)//hold t
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		string str_callID = to_string(callID);
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentRetrieveCall";
+		m_DeviceID2TalkState[deviceID] = "csConnect";
+		m_DeviceID2station[deviceID] = "取消保持";
+		m_DeviceID2CallID[deviceID] = str_callID;
 	}
 }
 
-void TSAPIInterface::AgentConferenceCall(DeviceID_t checkedDeivce , DeviceID_t deviceId)
+void TSAPIInterface::AgentConferenceCall(DeviceID_t checkedDevice , DeviceID_t deviceId)
 {
 	//ConnectionID_t m_heldConnectionID;
 	//strcpy((char *)&m_heldConnectionID.deviceID, (char *)deviceID);
 	//m_heldConnectionID.callID = heldCall;
 	//m_heldConnectionID.devIDType = STATIC_ID;
-	ConnectionID_t m_heldConnectionID = m_heldCall[checkedDeivce];
+	ConnectionID_t m_heldConnectionID = m_heldCall[checkedDevice];
 	//ConnectionID_t m_activeConnectionID;
 	//strcpy((char *)&m_activeConnectionID.deviceID, (char *)deviceID);
 	//m_activeConnectionID.callID = activeCall;
 	//m_activeConnectionID.devIDType = STATIC_ID;
-	ConnectionID_t m_activeConnectionID = m_activeCall[checkedDeivce];
+	ConnectionID_t m_activeConnectionID = m_activeCall[checkedDevice];
 	m_nRetCode = cstaConferenceCall(m_lAcsHandle	// handle returned by the acsOpenStream()
 		, ++m_ulInvokeID // application generated invokeID
 		, &m_heldConnectionID
 		, &m_activeConnectionID
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = to_string(*checkedDeivce);
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentConferenceCall";
-
 	if (m_nRetCode < 0)
 	{
 		// TSAPI Client has rejected the request.
@@ -1787,9 +2011,13 @@ void TSAPIInterface::AgentConferenceCall(DeviceID_t checkedDeivce , DeviceID_t d
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		//string str_callID = to_string(callID);
+		//m_DeviceID2CallID[checkedDeivce] = str_callID;
+		m_InvokeID2DeviceID[m_ulInvokeID] = checkedDevice;  // 哪个device
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentConferenceCall";
+		m_DeviceID2TalkState[checkedDevice] = "csConnect";
+		m_DeviceID2station[checkedDevice] = "三方";
 	}
-
 }
 
 void TSAPIInterface::AgentConsultationCall(DeviceID_t deviceId ,DeviceID_t calledDevice)//两方求助电话
@@ -1807,8 +2035,6 @@ void TSAPIInterface::AgentConsultationCall(DeviceID_t deviceId ,DeviceID_t calle
 		, (DeviceID_t *)calledDevice    //calledDevice
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceId;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentConsultationCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1827,7 +2053,12 @@ void TSAPIInterface::AgentConsultationCall(DeviceID_t deviceId ,DeviceID_t calle
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		//string str_callID = to_string(callID);
+		//m_DeviceID2CallID[checkedDeivce] = str_callID;
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceId; 
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentConsultationCall";
+		m_DeviceID2TalkState[deviceId] = "csConnect";
+		m_DeviceID2station[deviceId] = "保持";
 	}
 
 }
@@ -1845,8 +2076,6 @@ void TSAPIInterface::AgentDeflectCall(DeviceID_t deviceID, long activeCall, Devi
 		, (DeviceID_t *)&calledDevice    //calledDevice
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentDeflectCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1865,9 +2094,12 @@ void TSAPIInterface::AgentDeflectCall(DeviceID_t deviceID, long activeCall, Devi
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
-		//打印请求成功消息
-
+		string str_callID = to_string(activeCall);
+		m_DeviceID2CallID[deviceID] = str_callID;
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentDeflectCall";
+		m_DeviceID2TalkState[deviceID] = "csNull";
+		m_DeviceID2station[deviceID] = "转移";
 	}
 }
 
@@ -1890,8 +2122,6 @@ void TSAPIInterface::AgentPickupCall(DeviceID_t deviceID, long activeCall, Devic
 		, newDevice    //calledDevice
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentPickupCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1910,9 +2140,12 @@ void TSAPIInterface::AgentPickupCall(DeviceID_t deviceID, long activeCall, Devic
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
-		//打印请求成功消息
-
+		string str_callID = to_string(activeCall);
+		m_DeviceID2CallID[deviceID] = str_callID;
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentPickupCall";
+		m_DeviceID2TalkState[deviceID] = "csNull";
+		m_DeviceID2station[deviceID] = "转移";
 	}
 }
 
@@ -1952,9 +2185,12 @@ void TSAPIInterface::AgentTransferCall(DeviceID_t deviceID, long heldCall, long 
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
-		//打印请求成功消息
-
+		//string str_callID = to_string(activeCall);
+		//m_DeviceID2CallID[deviceID] = str_callID;
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentTransferCall";
+		m_DeviceID2TalkState[deviceID] = "csNull";
+		m_DeviceID2station[deviceID] = "转移";
 	}
 }
 
@@ -1974,8 +2210,6 @@ void TSAPIInterface::AgentReconnectCall(DeviceID_t deviceID, long heldCall, long
 		, (ConnectionID_t *)&m_activeConnectionID
 		, NULL); // private data is optional and is set as NULL here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentReconnectCall";
 
 	if (m_nRetCode < 0)
 	{
@@ -1994,11 +2228,13 @@ void TSAPIInterface::AgentReconnectCall(DeviceID_t deviceID, long heldCall, long
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
-		//打印请求成功消息
-
+		string str_callID = to_string(activeCall);
+		m_DeviceID2CallID[deviceID] = str_callID;
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentReconnectCall";
+		m_DeviceID2TalkState[deviceID] = "csConnect";
+		m_DeviceID2station[deviceID] = "三方";
 	}
-
 }
 /// <summary>
 /// This function help to retrieve the Current Status of the Agent.
@@ -2014,8 +2250,6 @@ void TSAPIInterface:: QueryAgentStatus(DeviceID_t deviceID)
 									, (DeviceID_t *)deviceID // Id of device on which Agent logs.
 									, NULL); // private data is optional and set as NUll here.
 
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
-	m_InvokeID2ActName[m_ulInvokeID] = "QueryAgentStatus";
 
 	if( m_nRetCode < 0 )
 	{
@@ -2031,7 +2265,8 @@ void TSAPIInterface:: QueryAgentStatus(DeviceID_t deviceID)
 	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceID;
+		m_InvokeID2ActName[m_ulInvokeID] = "QueryAgentStatus";
 	}
 		
 }
@@ -2120,8 +2355,6 @@ void TSAPIInterface::SnapshotDevice(DeviceID_t deviceId) {
 	DeviceID_t *snapshotObj;
 	snapshotObj = (DeviceID_t*)deviceId;
 
-
-
 	m_nRetCode = cstaSnapshotDeviceReq(
 		m_lAcsHandle,
 		++m_ulInvokeID, // application generated invokeID
@@ -2140,10 +2373,9 @@ void TSAPIInterface::SnapshotDevice(DeviceID_t deviceId) {
 		}
 	}
 	else {
-
+		m_InvokeID2DeviceID[m_ulInvokeID] = deviceId;//(int)atoi()
+		m_InvokeID2ActName[m_ulInvokeID] = "AgentSnapshotDevice";
 	}
-	m_InvokeID2DeviceID[m_ulInvokeID] = deviceId;//(int)atoi()
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentSnapshotDevice";
 }
 
 //This function monitor the talking device 
@@ -2176,9 +2408,26 @@ void TSAPIInterface::SingleStepConferenceCall(DeviceID_t checkedDevice,DeviceID_
 			m_lAcsHandle,
 			++m_ulInvokeID,
 			(PrivateData_t *)&m_stPrivateData);
+		if (m_nRetCode < 0)
+		{
+			switch (m_nRetCode)
+			{
+			case ACSERR_BADHDL:
+			{
+				// m_lAcsHandle is Invalid 
+			}break;
+			default: {break; }
+			}
+		}
+		else
+		{
+			m_InvokeID2DeviceID[m_ulInvokeID] = device;//(int)atoi()
+			m_InvokeID2ActName[m_ulInvokeID] = "SingleStepConferenceCall";
+			m_DeviceID2TalkState[device] = "csConnect";
+			m_DeviceID2station[checkedDevice] = "组呼";
+		}
 	}
-	m_InvokeID2DeviceID[m_ulInvokeID] = device;//(int)atoi()
-	m_InvokeID2ActName[m_ulInvokeID] = "SingleStepConferenceCall";
+
 }
 
 void TSAPIInterface::SingleStepTransferCall(DeviceID_t calledDevice, DeviceID_t checkedDevice) {
@@ -2194,33 +2443,36 @@ void TSAPIInterface::SingleStepTransferCall(DeviceID_t calledDevice, DeviceID_t 
 		MessageBox("Error Setting the Private Data");
 		return;
 	}
-
-	m_nRetCode = cstaEscapeService(m_lAcsHandle	// handle returned by the acsOpenStream()
-		,++m_ulInvokeID // application generated invokeID
-		, (PrivateData_t *)&m_stPrivateData
-	); // private data is optional and is set as NULL here.
-
-	m_InvokeID2DeviceID[m_ulInvokeID] = checkedDevice;
-	m_InvokeID2ActName[m_ulInvokeID] = "AgentSingleStepTransferCall";
-
-	if (m_nRetCode < 0)
-	{
-		// TSAPI Client has rejected the request.
-		// The error code is in m_nRetCode;
-		switch (m_nRetCode)
-		{
-		case ACSERR_BADHDL:
-		{// AcsHandle is Invalid
-		}
-		default:
-		{
-
-		}
-		}
-	}
 	else
 	{
-		// TSAPI Client has accepted the request.
+		m_nRetCode = cstaEscapeService(m_lAcsHandle	// handle returned by the acsOpenStream()
+			, ++m_ulInvokeID // application generated invokeID
+			, (PrivateData_t *)&m_stPrivateData
+		); // private data is optional and is set as NULL here.
+
+
+		if (m_nRetCode < 0)
+		{
+			// TSAPI Client has rejected the request.
+			// The error code is in m_nRetCode;
+			switch (m_nRetCode)
+			{
+			case ACSERR_BADHDL:
+			{// AcsHandle is Invalid
+			}
+			default:
+			{
+
+			}
+			}
+		}
+		else
+		{
+			m_InvokeID2DeviceID[m_ulInvokeID] = checkedDevice;
+			m_InvokeID2ActName[m_ulInvokeID] = "AgentSingleStepTransferCall";
+			m_DeviceID2TalkState[checkedDevice] = "csNull";
+			m_DeviceID2station[checkedDevice] = "转移";
+		}
 	}
 }
 
