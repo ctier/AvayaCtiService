@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "StatusRecord.h"
-
+#include "AvayaCtiService.h"
 
 StatusRecord::StatusRecord()
 {
@@ -17,10 +17,15 @@ bool StatusRecord::init()
 	}
 	char* server = "localhost";
 	char* username = "root";
-	char* password = "9201";
+	char* password = "6020561";
 	char* database = "ctidb";
 	int port = 3306;
 	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
+
+
+	string mes = m_pMySQLInterface->Open();
+	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + mes.c_str() + "\r\n";
+	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
 
 	//来话记录表  //Delivered Event  电话送递事件
 	CallProcessList.push_back("ID");//主键

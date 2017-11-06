@@ -1410,7 +1410,10 @@ bool TSAPIInterface::OpenStream(TCHAR* serverID, TCHAR* loginID, TCHAR* password
 
 	if (m_nRetCode < 0)
 	{	
-		//	m_ulInvokeID = 0;
+		//m_ulInvokeID = 0;
+
+		//m_InvokeID2ActName[m_ulInvokeID] = "OpenStream";
+
 		switch( m_nRetCode)
 		{
 		case ACSERR_BADHDL:	// ACS Handle (m_lAcsHandle) is Invalid

@@ -13,10 +13,15 @@ bool AvayaCallCenterRouting::init()
 
 	char* server = "localhost";
 	char* username = "root";
-	char* password = "9201"; 
+	char* password = "6020561"; 
 	char* database = "ctidb"; 
 	int port = 3306;
 	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
+	string mes = m_pMySQLInterface->Open();
+	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + mes.c_str() + "\r\n";
+	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+
 	// get the TSAPIInterface Object
 	m_pTsapiInterfaceObject = TSAPIInterface::GetInstance();
 
@@ -55,10 +60,13 @@ void AvayaCallCenterRouting::RouteSelectInv(RouteRegisterReqID_t routeRegisterRe
 string AvayaCallCenterRouting::InsertNumber(const char *telephonenumber,const char *type)
 {
 	//,'ADDTIME'
-	string Request = "INSERT INTO NUMBERLIST('NUMBER','TYPE') VALUES('";
+	string Request = "INSERT INTO NUMBERLIST(NUMBER,TYPE,ADDTIME) VALUES('";
+	string time = theApp.m_pAvayaCtiUIDlg->GetTimeStr();
 	Request += telephonenumber;
 	Request += "','";
 	Request += type;
+	Request += "','";
+	Request += time;
 	Request += "')";
 	return m_pMySQLInterface->Insert(Request);
 }
@@ -89,7 +97,7 @@ string AvayaCallCenterRouting::SelectNumber(const char *telephonenumber, vector<
 	return m_pMySQLInterface->SelectOneLine(Request, data);
 }
 
-void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData)
+void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData)////
 {
 	//RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
 	routeRegisterReqID = routeRequestExt.routeRegisterReqID;//是同一个吗？

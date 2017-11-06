@@ -239,6 +239,6 @@ string MySQLInterface::ErrorIntoMySQL()
 {
 	ErrorNum = mysql_errno(&MysqlInstance);//未返回 是否需要ErrorNum接口 ？
 	ErrorInfo = mysql_error(&MysqlInstance);
-	string res = ErrorInfo;
+	string res = "ErrorNum :" + to_string(ErrorNum) + ";" + ErrorInfo;
 	return res;
 }
