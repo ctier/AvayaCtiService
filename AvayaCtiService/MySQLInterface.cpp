@@ -1,6 +1,6 @@
 #include "stdafx.h"  
 #include "MySQLInterface.h"  
-
+#include "mysql.h"
 
 MySQLInterface::MySQLInterface() :
 	ErrorNum(0), ErrorInfo("ok")

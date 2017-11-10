@@ -460,6 +460,8 @@ void AvayaCtiUI::OnBnClickedLoginBtn()
 	GetDlgItem(IDC_DEVICE_EDIT)->GetWindowTextA(deviceId);
 
 	message = "{ \"method\":\"AgentLogin\",\"DeviceID\" : \"" + deviceId + "\",\"AgentID\" : \"" + loginId + "\",\"AgentPassword\": \"\",\"WorkMode\": \"" + workmode + "\" }";
+	//m_strAgentStatus = message.c_str();
+	//UpdateData(FALSE);
 	GetDlgItem(IDC_MESSAGE)->SetWindowTextA(message.c_str());
 	AvayaCtiUI::OnBnClickedBegin();
 	//SelectTSAPIInterface(message);
@@ -863,6 +865,7 @@ void AvayaCtiUI::OnCbnSelchangeRoutingType()
 
 void AvayaCtiUI::OnCbnDropdownRoutingType()
 {
+	m_cbRoutingType.Clear();
 	m_cbRoutingType.AddString("VIP");
 	m_cbRoutingType.AddString("黑名单");
 	m_cbRoutingType.AddString("重复报警");
@@ -885,7 +888,9 @@ void AvayaCtiUI::UpdataViewStatus(string mes)
 
 void AvayaCtiUI::OnBnClickedRoutingRegister()
 {
-	//m_pRoutingObject->RouteRegister();//DeviceID_t 是什么,当前坐席电话？设备名？
+	UpdateData(TRUE);//m_strRouting
+	char* message = (LPSTR)(LPCTSTR)m_strRouting;
+	m_pRoutingObject->RouteRegister((DeviceID_t*)message);//DeviceID_t 是什么,当前坐席电话？设备名？
 }
 
 

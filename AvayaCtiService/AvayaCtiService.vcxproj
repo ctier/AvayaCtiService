@@ -76,8 +76,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\inc;D:\Program Files %28x86%29\mysql-5.7.20-win32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>.\lib;D:\Program Files %28x86%29\mysql-5.7.20-win32\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>.\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

@@ -951,6 +951,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 
 	case CSTA_SERVICE_INITIATED ://Service Initiated Event  服务启动
 	{
+		mes["ActName"] = "CSTA_SERVICE_INITIATED";
 		long callID = cstaEvent.event.cstaUnsolicited.u.serviceInitiated.initiatedConnection.callID;
 		char *initiated_devID = cstaEvent.event.cstaUnsolicited.u.serviceInitiated.initiatedConnection.deviceID;
 		//输出启动服务的 callID 与 devID
@@ -969,6 +970,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 	{
 		// This event is generated in sequence after the tehe CSTA_SERVICE_INITIATED_EVENT
 		// when Agent makes a call
+		mes["ActName"] = "CSTA_ORIGINATED";
 
 		// When Agent makes request to logs out manaully , This event is not generated
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.originated.originatedConnection.callID;
@@ -979,7 +981,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		//输出连接的呼叫双方
 		mes["callID"] = to_string(usCallID);
 		mes["called_devID"] = called_devID;
-		mes["calling_devID"] = calling_devID;
+		//mes["calling_devID"] = calling_devID;
 		mes["caller"] = DeviceID;////
 		mes["station"] = "开始";
 		mes["DeviceID"] = DeviceID;
@@ -1003,7 +1005,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		// This event is generated when Agent Logged out manually
 		//if else
 
-
+		mes["ActName"] = "CSTA_CONNECTION_CLEARED";
 
 		// This event is received when Call is disconnected by Agent or
 		// by the Other Party involved in the call, at this time 
@@ -1078,6 +1080,8 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 	}break;
 	case CSTA_RETRIEVED://CSTARetrievedEvent 恢复连接事件
 	{// This event is received when held call is retrieved.
+		mes["ActName"] = "CSTA_RETRIEVED";
+
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.retrieved.retrievedConnection.callID;
 		char *retrieved_devID = cstaEvent.event.cstaUnsolicited.u.retrieved.retrievedConnection.deviceID;
 		char *retrieving_devID = cstaEvent.event.cstaUnsolicited.u.retrieved.retrievingDevice.deviceID;
@@ -1118,6 +1122,8 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 
 	case CSTA_DELIVERED: //Delivered Event  电话送递事件 （振铃）
 	{
+		mes["ActName"] = "CSTA_DELIVERED";
+
 		WORD callID =0;
 		callID = (WORD)cstaEvent.event.cstaUnsolicited.u.delivered.connection.callID;//正发出振铃的callID
 		char *called_devID = cstaEvent.event.cstaUnsolicited.u.delivered.alertingDevice.deviceID;
@@ -1138,7 +1144,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		ConnectionID_Device_t devIDType = cstaEvent.event.cstaUnsolicited.u.delivered.connection.devIDType;
 		mes["devIDType"] = devIDType;
 		mes["called_devID"] = called_devID;
-		mes["calling_devID"] = calling_devID;
+		//mes["calling_devID"] = calling_devID;
 		mes["callID"] = to_string(callID);
 		//DeviceID = called_devID;
 		DeviceID = calling_devID;
@@ -1160,6 +1166,8 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 
 	case CSTA_ESTABLISHED: //通知已建立连接事件
 	{
+		mes["ActName"] = "CSTA_ESTABLISHED";
+
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.established.establishedConnection.callID;
 		char *m_answeringdevID = cstaEvent.event.cstaUnsolicited.u.established.answeringDevice.deviceID;
 		char *m_callingDevID = cstaEvent.event.cstaUnsolicited.u.established.callingDevice.deviceID;
@@ -1169,7 +1177,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		mes["DeviceID"] = DeviceID;
 		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
 		mes["answeringDevice"] = m_answeringdevID;
-		mes["callingDevice"] = m_callingDevID;
+		//mes["callingDevice"] = m_callingDevID;
 		mes["callID"] = to_string(usCallID);
 		mes["caller"] = m_callingDevID;
 		mes["station"] = "csConnect";
@@ -1192,6 +1200,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 	{
 		// update the call Manager class and update the Agent class
 		// for updates in the Agent and the Call state
+		mes["ActName"] = "CSTA_TRANSFERRED";
 
 		long lPrimaryCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.transferred.primaryOldCall.callID;
 		long lSecondryCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.transferred.secondaryOldCall.callID;//保留的callID
@@ -1225,14 +1234,14 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		}
 		//DeviceID = transferred_devID;
 		DeviceID = transferring_devID;
-		mes["primaryOldCall"] = lPrimaryCallID;
-		mes["secondaryOldCall"] = lSecondryCallID;
+		//mes["primaryOldCall"] = lPrimaryCallID;
+		//mes["secondaryOldCall"] = lSecondryCallID;
 		mes["transferringDevice"] = transferring_devID;
-		mes["transferredConnections"] = transferred_devID;
+		//mes["transferredConnections"] = transferred_devID;
 
 		mes["callID"] = to_string(lSecondryCallID);
 		mes["DeviceID"] = DeviceID;
-		mes["AgentID"] = DeviceID;
+		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
 		mes["TalkState"] = "csNull";
 		mes["caller"] = DeviceID;
 		mes["station"] = "转移";
@@ -1254,6 +1263,7 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 	{
 		// This event is generated whenever Agent performs the Conference 
 		// or anyother party performs conference
+		mes["ActName"] = "CSTA_CONFERENCED";
 
 		// 1. When Agent Performs the Conference Call
 		// - remove the old call Object 
@@ -1265,19 +1275,19 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		{
 			WORD newCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.conferenced.conferenceConnections.connection->party.callID;
 			WORD oldCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.conferenced.primaryOldCall.callID;
-			mes["newCallID"] = to_string(newCallID);
-			mes["oldCallID"] = to_string(oldCallID);
+			//mes["newCallID"] = to_string(newCallID);
+			//mes["oldCallID"] = to_string(oldCallID);
+			mes["callID"] = to_string(newCallID);
 
 		}
 		DeviceID = calling_devID;
 		//DeviceID = called_devID;
 		mes["called_devID"] = called_devID;
-		mes["calling_devID"] = calling_devID;
-		mes["confer_devID"] = confer_devID;
+		//mes["calling_devID"] = calling_devID;
+		//mes["confer_devID"] = confer_devID;
 		mes["DeviceID"] = DeviceID;
 		mes["TalkState"] = "csConnect";
 		mes["AgentID"] = m_DeviceID2AgentID[DeviceID];
-		mes["callID"] = mes["newCallID"];
 		mes["station"] = "组呼";
 		mes["caller"] = DeviceID;
 
@@ -1295,6 +1305,8 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 	break;
 	case CSTA_HELD :
 	{
+		mes["ActName"] = "CSTA_HELD";
+
 		usCallID = (WORD)cstaEvent.event.cstaUnsolicited.u.held.heldConnection.callID;
 		char * holding_DevID = cstaEvent.event.cstaUnsolicited.u.held.heldConnection.deviceID;
 
@@ -1306,12 +1318,13 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		if ( cstaEvent.event.cstaUnsolicited.u.held.localConnectionInfo == csHold)
 		{
 			//theApp.m_pAvayaCtiUIDlg->m_pCallManagerObject->UpdateCall(usCallID,caActive,conHold,holding_DevID,"","");
-			mes["localConnectionInfo"] = "csHold";
+			//mes["localConnectionInfo"] = "csHold";
+			mes["TalkState"] = "caHold";
 
 		}
-		mes["DeviceID"] = cstaEvent.event.cstaUnsolicited.u.held.holdingDevice.deviceID;
-		mes["AgentID"] = mes["DeviceID"];
-		mes["TalkState"] = "caHold";
+		DeviceID = cstaEvent.event.cstaUnsolicited.u.held.holdingDevice.deviceID;
+		mes["DeviceID"] = DeviceID;
+		mes["AgentID"] =m_DeviceID2AgentID[DeviceID];
 		mes["callID"] = to_string(usCallID);
 		mes["caller"] = DeviceID;
 		mes["station"] = "保持";
