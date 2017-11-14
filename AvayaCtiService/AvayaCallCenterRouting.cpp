@@ -99,23 +99,29 @@ string AvayaCallCenterRouting::SelectNumber(const char *telephonenumber, vector<
 
 void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t routeRequestExt, ATTPrivateData_t privateData)////
 {
-	//RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
-	routeRegisterReqID = routeRequestExt.routeRegisterReqID;//是同一个吗？
-	RoutingCrossRefID_t routingCrossRefID = routeRequestExt.routingCrossRefID;//路由会话的唯一句柄
-	CalledDeviceID_t currentRoute = routeRequestExt.currentRoute;//指定调用的目标
 	CallingDeviceID_t callingDevice = routeRequestExt.callingDevice;//指定调用起始设备
+	string callingDeviceID = callingDevice.deviceID;//主叫号码
+	CalledDeviceID_t currentRoute = routeRequestExt.currentRoute;//指定调用的目标
+	string calledDeviceID = currentRoute.deviceID;//被叫号码
+
+
+	//RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
+	routeRegisterReqID = routeRequestExt.routeRegisterReqID;
+	//routeRegisterReqID = 	theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->m_DeviceID2RouteRegisterReqID[callingDevice];
+
+	RoutingCrossRefID_t routingCrossRefID = routeRequestExt.routingCrossRefID;//路由会话的唯一句柄
 	ConnectionID_t routedCall = routeRequestExt.routedCall;//指定要路由的调用的 callID。 这是路由设备 connectionID 的路由调用。
 	SelectValue_t routedSelAlgorithm = routeRequestExt.routedSelAlgorithm;//指示所请求的路由算法的类型。它被设置为 SV_NORMAL。
 	unsigned char priority = routeRequestExt.priority;//指示调用的优先级
 	SetUpValues_t setupInformation = routeRequestExt.setupInformation;//包含 ISDN 呼叫设置消息
 
 	ATTEvent_t att_event;
-
+	/*
 	if (attPrivateData((ATTPrivateData_t *)&privateData, &att_event) == ATT_ROUTE_REQUEST)
 	{
 		att_event.u.routeRequest;
 	}
-
+	*/
 	//根据  指定要路由的调用的 callID  ,在数据库中查询，分情况对调用callID进行操作
 	string callID = to_string(routedCall.callID);
 	const char* telephonenumber = callID.c_str();
@@ -153,6 +159,8 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 			TRUE,
 			NULL);
 	}
+//	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + DeviceID.c_str() + " : 注册成功" + "\r\n";
+//	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
 
 }
 

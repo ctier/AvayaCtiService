@@ -335,6 +335,14 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 
 	switch (cstaEvent.eventHeader.eventType)
 	{
+	case CSTA_ROUTE_REGISTER_REQ_CONF:
+	{
+		RouteRegisterReqID_t m_routeRegisterReqID = cstaEvent.event.cstaConfirmation.u.routeRegister.registerReqID;
+		m_DeviceID2RouteRegisterReqID[DeviceID] = to_string(m_routeRegisterReqID);
+		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + DeviceID.c_str() + " : 注册成功" + "\r\n";
+		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+
+	}break;
 	case CSTA_MONITOR_CONF://开启监控返回事件  
 	{	
 		// retrived the monitor cross reference ID  
