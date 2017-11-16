@@ -34,15 +34,15 @@ AvayaCallCenterRouting::~AvayaCallCenterRouting()
 	delete m_pMySQLInterface;
 }
 
-//？ 什么时候发，谁调用
+
 void AvayaCallCenterRouting::RouteEndInv(RouteRegisterReqID_t RouteRegisterReqID, RoutingCrossRefID_t RoutingCrossRefID)
 {
 	m_pTsapiInterfaceObject->RouteEndInv(RouteRegisterReqID, RoutingCrossRefID);
 }
 
-void AvayaCallCenterRouting::RouteRegisterCancel(RouteRegisterReqID_t RouteRegisterReqID)
+void AvayaCallCenterRouting::RouteRegisterCancel(DeviceID_t routingDevice)
 {
-	m_pTsapiInterfaceObject->RouteRegisterCancel(RouteRegisterReqID);
+	m_pTsapiInterfaceObject->RouteRegisterCancel(routingDevice);
 }
 
 void AvayaCallCenterRouting::RouteRegister(DeviceID_t* routingDevice)
@@ -106,10 +106,12 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 
 
 	//RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
-	routeRegisterReqID = routeRequestExt.routeRegisterReqID;
+	RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;
 	//routeRegisterReqID = 	theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->m_DeviceID2RouteRegisterReqID[callingDevice];
 
 	RoutingCrossRefID_t routingCrossRefID = routeRequestExt.routingCrossRefID;//路由会话的唯一句柄
+	m_DeviceID2RoutingCrossRefID[calledDeviceID] = to_string(routingCrossRefID);
+
 	ConnectionID_t routedCall = routeRequestExt.routedCall;//指定要路由的调用的 callID。 这是路由设备 connectionID 的路由调用。
 	SelectValue_t routedSelAlgorithm = routeRequestExt.routedSelAlgorithm;//指示所请求的路由算法的类型。它被设置为 SV_NORMAL。
 	unsigned char priority = routeRequestExt.priority;//指示调用的优先级
@@ -136,7 +138,7 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 		RouteSelectInv(
 			routeRegisterReqID,
 			routingCrossRefID,
-			(DeviceID_t *)currentRoute.deviceID,
+			(DeviceID_t *)currentRoute.deviceID,//被叫号码
 			1,
 			&setupInformation,
 			TRUE,
@@ -164,13 +166,14 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 
 }
 
-void AvayaCallCenterRouting::RouteEndEvent(CSTARouteEndEvent_t routeEnd)
+void AvayaCallCenterRouting::RouteEndEvent(CSTAEvent_t cstaEvent)
 {
 	map<string, string> mes;
+	string DeviceID = theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->m_InvokeID2DeviceID[cstaEvent.event.cstaConfirmation.invokeID];
 
-	RouteRegisterReqID_t routeRegisterReqID = routeEnd.routeRegisterReqID;
-	RoutingCrossRefID_t routingCrossRefID = routeEnd.routingCrossRefID;//请求路由到的坐席ID,在CSTARouteRequestExtEvent中收到该句柄
-	CSTAUniversalFailure_t errorValue = routeEnd.errorValue;
+	RouteRegisterReqID_t routeRegisterReqID = cstaEvent.event.cstaEventReport.u.routeEnd.routeRegisterReqID;
+	RoutingCrossRefID_t routingCrossRefID = cstaEvent.event.cstaEventReport.u.routeEnd.routingCrossRefID;//请求路由到的坐席ID,在CSTARouteRequestExtEvent中收到该句柄
+	CSTAUniversalFailure_t errorValue = cstaEvent.event.cstaEventReport.u.routeEnd.errorValue;
 	if (errorValue == 0)
 	{
 		mes["error"] = "GENERIC_UNSPECIFIED";
@@ -179,13 +182,18 @@ void AvayaCallCenterRouting::RouteEndEvent(CSTARouteEndEvent_t routeEnd)
 	{
 		mes["error"] = "GENERIC_SUBSCRIBED_RESOURCE_AVAILABILITY";
 	}//...
+	string res = theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->ReturnMes(mes);
 
+	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + res.c_str() + "\r\n";
+	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+	m_DeviceID2RoutingCrossRefID.erase(DeviceID);
 }
 
 
-void AvayaCallCenterRouting::RouteRegisterAbortEvent(CSTARouteRegisterAbortEvent_t registerAbort)
+void AvayaCallCenterRouting::RouteRegisterAbortEvent(CSTAEvent_t& cstaEvent)
 {
-	RouteRegisterReqID_t routeRegisterReqID = registerAbort.routeRegisterReqID;
+	string DeviceID = theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->m_InvokeID2DeviceID[cstaEvent.event.cstaConfirmation.invokeID];
+	m_DeviceID2RouteRegisterReqID.erase(DeviceID);
 	//写入数据库  发送监控
 
 }
@@ -206,8 +214,15 @@ void AvayaCallCenterRouting::RouteUsedExtEvent(CSTARouteUsedExtEvent_t routeUsed
 	}
 	*/
 
-	//?除了确认 事件 还有什么用
 	//写入数据库  发送监控
 
 }
 
+void AvayaCallCenterRouting::RouteRequestReqConfEvent(CSTAEvent_t cstaEvent, ATTPrivateData_t privateData)
+{
+	RouteRegisterReqID_t m_routeRegisterReqID = cstaEvent.event.cstaConfirmation.u.routeRegister.registerReqID;
+	string DeviceID = theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->m_InvokeID2DeviceID[cstaEvent.event.cstaConfirmation.invokeID];
+	m_DeviceID2RouteRegisterReqID[DeviceID] = to_string(m_routeRegisterReqID);//
+	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + DeviceID.c_str() + " : 注册成功" + "\r\n";
+	theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
+}

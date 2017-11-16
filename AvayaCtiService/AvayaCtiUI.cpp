@@ -890,11 +890,14 @@ void AvayaCtiUI::OnBnClickedRoutingRegister()
 {
 	UpdateData(TRUE);//m_strRouting
 	char* message = (LPSTR)(LPCTSTR)m_strRouting;
-	m_pRoutingObject->RouteRegister((DeviceID_t*)message);//DeviceID_t 是什么,当前坐席电话？设备名？
+	m_pRoutingObject->RouteRegister((DeviceID_t*)message);//DeviceID_t 需要路由的电话ID 如110,119
 }
 
 
 void AvayaCtiUI::OnBnClickedRoutingRegistercancel()
 {
-	m_pRoutingObject->RouteRegisterCancel(m_pRoutingObject->routeRegisterReqID);
+	UpdateData(TRUE);//m_strRouting
+	char* message = (LPSTR)(LPCTSTR)m_strRouting;
+
+	m_pRoutingObject->RouteRegisterCancel(message);
 }

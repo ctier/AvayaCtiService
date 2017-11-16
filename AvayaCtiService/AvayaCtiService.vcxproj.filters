@@ -54,6 +54,9 @@
     <ClInclude Include="StatusRecord.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Tsapi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AvayaCtiService.cpp">
@@ -87,6 +90,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="StatusRecord.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Tsapi.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

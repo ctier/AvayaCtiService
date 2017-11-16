@@ -210,11 +210,11 @@ void TSAPIInterface::HandleCSTAEventReport(CSTAEvent_t cstaEvent, ATTPrivateData
 	case CSTA_ROUTE_END://路由结束事件
 	//终止呼叫的路由会话,并通知呼叫路由结果(通用故障) 
 	{
-		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteEndEvent(cstaEvent.event.cstaEventReport.u.routeEnd);
+		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteEndEvent(cstaEvent);
 	}break;//end of CSTA_ROUTE_END
 	case CSTA_ROUTE_REGISTER_ABORT://交换机取消路由注册会话事件
 	{
-		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteRegisterAbortEvent(cstaEvent.event.cstaEventReport.u.registerAbort);
+		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteRegisterAbortEvent(cstaEvent);
 	}break;//end of CSTA_ROUTE_REGISTER_ABORT
 	case CSTA_ROUTE_USED_EXT://路由目标提供事件
 	{
@@ -337,11 +337,7 @@ void TSAPIInterface::HandleCSTAConfirmation(CSTAEvent_t cstaEvent, ATTPrivateDat
 	{
 	case CSTA_ROUTE_REGISTER_REQ_CONF:
 	{
-		RouteRegisterReqID_t m_routeRegisterReqID = cstaEvent.event.cstaConfirmation.u.routeRegister.registerReqID;
-		m_DeviceID2RouteRegisterReqID[DeviceID] = to_string(m_routeRegisterReqID);
-		theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + DeviceID.c_str() + " : 注册成功" + "\r\n";
-		theApp.m_pAvayaCtiUIDlg->UpdateData(FALSE);
-
+		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteRequestReqConfEvent(cstaEvent, privateData);
 	}break;
 	case CSTA_MONITOR_CONF://开启监控返回事件  
 	{	
@@ -1083,8 +1079,10 @@ void TSAPIInterface::HandleCSTAUnsolicited(CSTAEvent_t cstaEvent)
 		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Stationstate", "Insert", mes);
 		//记录到通话状态记录表
 		theApp.m_pAvayaCtiUIDlg->m_pStatusRecordObject->Request("Callstate", "Insert", mes);
-
-
+		//调用路由终止函数
+		theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->RouteEndInv(
+				stoi(theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->m_DeviceID2RouteRegisterReqID[DeviceID]),
+				stoi(theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->m_DeviceID2RoutingCrossRefID[DeviceID]));
 	}break;
 	case CSTA_RETRIEVED://CSTARetrievedEvent 恢复连接事件
 	{// This event is received when held call is retrieved.
@@ -2529,8 +2527,10 @@ void TSAPIInterface::RouteEndInv(RouteRegisterReqID_t routeRegisterReqID, Routin
 	m_InvokeID2ActName[m_ulInvokeID] = "RouteEndInv";
 }
 
-void TSAPIInterface::RouteRegisterCancel(RouteRegisterReqID_t routeRegisterReqID)
+void TSAPIInterface::RouteRegisterCancel(DeviceID_t DeviceID)
 {
+	string deviceID = DeviceID;
+	RouteRegisterReqID_t routeRegisterReqID = stoi(theApp.m_pAvayaCtiUIDlg->m_pRoutingObject->m_DeviceID2RouteRegisterReqID[deviceID]);//
 	m_nRetCode = cstaRouteRegisterCancel(
 		m_lAcsHandle,
 		(InvokeID_t)++m_ulInvokeID, // application generated invokeID

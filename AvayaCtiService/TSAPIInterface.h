@@ -136,7 +136,7 @@ public:
 
 	//Routing Service   //CTI调用  不开放给Agent  //参数怎么用？默认？
 	void RouteEndInv(RouteRegisterReqID_t, RoutingCrossRefID_t);
-	void RouteRegisterCancel(RouteRegisterReqID_t);
+	void RouteRegisterCancel(DeviceID_t);
 	void RouteRegister(DeviceID_t*);
 	void RouteSelectInv(RouteRegisterReqID_t,RoutingCrossRefID_t, DeviceID_t *, RetryValue_t, SetUpValues_t *, Boolean, PrivateData_t *);
 	~TSAPIInterface();
@@ -144,6 +144,8 @@ public:
 	/////整理返回消息
 	//string ReturnMes(string mes, ...);
 	string ReturnMes(map<string,string>);
+	map<InvokeID_t, string> m_InvokeID2DeviceID;//绑定请求ID与请求分机号
+
 protected :
 
 	// pointer to one and only instance of this class
@@ -156,7 +158,6 @@ protected :
 
 private :
 	KafkaProducer* m_pProducerObject;
-	map<InvokeID_t, string> m_InvokeID2DeviceID;//绑定请求ID与请求分机号
 	map<InvokeID_t, string> m_InvokeID2ActName;//绑定请求ID与操作名
 	
 	map<string, string> m_DeviceID2AgentID;//只用于登陆 登出
@@ -164,7 +165,6 @@ private :
 	map<string, string> m_DeviceID2CallID;
 	map<string, string> m_DeviceID2TalkState;
 	map<string, string> m_DeviceID2station;//1：开始2：结束	3：保持	4：取消保持	5：转移 6：三方 7：组呼
-	map<string, string> m_DeviceID2RouteRegisterReqID;
 
 	map<string, ConnectionID_t> m_activeCall;//设备的正在通话的connectionID
 	map<string, ConnectionID_t> m_heldCall;//设备正在保持的connectionID
