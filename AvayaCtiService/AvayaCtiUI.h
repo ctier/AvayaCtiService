@@ -95,7 +95,6 @@ public:
 	CComboBox m_cbRoutingType;
 	CString m_strRoutingType;
 	afx_msg void OnCbnSelchangeRoutingType();
-	afx_msg void OnCbnDropdownRoutingType();
 	afx_msg void OnBnClickedRoutingUpdata();
 	afx_msg void OnBnClickedClearBtn();
 	afx_msg void OnBnClickedRoutingRegister();

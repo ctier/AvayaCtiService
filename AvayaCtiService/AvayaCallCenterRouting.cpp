@@ -11,11 +11,51 @@ bool AvayaCallCenterRouting::init()
 	//创建MySQLInterface对象
 	m_pMySQLInterface = MySQLInterface::GetInstance();
 
-	char* server = "localhost";
-	char* username = "root";
-	char* password = "6020561"; 
-	char* database = "ctidb"; 
-	int port = 3306;
+	HINSTANCE hInst = AfxGetInstanceHandle();
+	char szFileName[MAX_PATH];
+	GetModuleFileName(hInst, szFileName, MAX_PATH);
+	CString filename = szFileName;
+	filename.TrimRight("AvayaCtiService.exe");
+	filename.Append("Settings.ini");
+
+
+	CFileFind fileFind;
+
+	char* server;
+	char* username;
+	char* password;
+	char* database;
+	int port;
+
+	if (fileFind.FindFile(filename) == FALSE)
+	{
+		char msg[512];
+		sprintf_s(msg, "%s%s", filename,
+			FILE_NOT_FOUND);
+		::MessageBox(NULL, msg, "File Not Found Error", MB_OK);
+	}
+	else
+	{
+		TCHAR m_szServerID[BUFFER_SIZE];		// ServerID of CtiDB
+		TCHAR m_szUsername[BUFFER_SIZE];		// Username for accessing CtiDB
+		TCHAR m_szPassword[BUFFER_SIZE];		// Username Password for CtiDB
+		TCHAR m_szDatabase[BUFFER_SIZE];		// CtiDB
+		TCHAR m_szPort[BUFFER_SIZE];			// port
+
+		// GetPrivateProfileString(...) is used for reteriving values from the Settings.ini file
+		GetPrivateProfileString("RoutingDB", "server", "", m_szServerID, sizeof(m_szServerID), filename);
+		GetPrivateProfileString("RoutingDB", "username", "", m_szUsername, sizeof(m_szUsername), filename);
+		GetPrivateProfileString("RoutingDB", "password", "", m_szPassword, sizeof(m_szPassword), filename);
+		GetPrivateProfileString("RoutingDB", "database", "", m_szDatabase, sizeof(m_szDatabase), filename);
+		GetPrivateProfileString("RoutingDB", "port", "", m_szPort, sizeof(m_szPort), filename);
+
+		server = m_szServerID;
+		username = m_szUsername;
+		password = m_szPassword;
+		database = m_szDatabase;
+		port = atoi(m_szPort);
+	}
+
 	m_pMySQLInterface->SetMySQLConInfo(server, username, password, database, port);
 	string mes = m_pMySQLInterface->Open();
 	theApp.m_pAvayaCtiUIDlg->m_strAgentStatus = theApp.m_pAvayaCtiUIDlg->m_strAgentStatus + mes.c_str() + "\r\n";
@@ -107,7 +147,6 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 
 	//RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;//路由服务的路由注册会话的句柄
 	RouteRegisterReqID_t routeRegisterReqID = routeRequestExt.routeRegisterReqID;
-	//routeRegisterReqID = 	theApp.m_pAvayaCtiUIDlg->m_pTSAPIInterface->m_DeviceID2RouteRegisterReqID[callingDevice];
 
 	RoutingCrossRefID_t routingCrossRefID = routeRequestExt.routingCrossRefID;//路由会话的唯一句柄
 	m_DeviceID2RoutingCrossRefID[calledDeviceID] = to_string(routingCrossRefID);
@@ -147,7 +186,7 @@ void AvayaCallCenterRouting::RouteRequestExtEvent(CSTARouteRequestExtEvent_t rou
 	}
 	else if (data[2] == "黑名单")
 	{
-		//不选？
+		//
 	}
 	else//普通
 	{

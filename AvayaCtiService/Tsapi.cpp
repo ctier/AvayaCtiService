@@ -259,6 +259,8 @@ long CTsapiDevice::GetCallHandle(ConnectionID_t & connID, BOOL exactMatch)
 	return 0;
 }
 
+
+
 /////////////////////////////////////////////////////////////////////////////
 // The one and only CTsapiWnd object
 

@@ -59,6 +59,10 @@ BOOL AvayaCtiUI::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	m_cbRoutingType.AddString("VIP");
+	m_cbRoutingType.AddString("黑名单");
+	m_cbRoutingType.AddString("重复报警");
+
 	// This will get the window handler for AgentStateUI 
 	theApp.m_hAgtStateUI = this->GetSafeHwnd();
 
@@ -150,6 +154,8 @@ BOOL AvayaCtiUI::OnInitDialog()
 	*/
 	// display the Agent Initial Configuration
 	//InitializeDialog();
+
+
 
 	UpdateData(FALSE);
 
@@ -424,7 +430,6 @@ BEGIN_MESSAGE_MAP(AvayaCtiUI, CDialog)
 	ON_BN_CLICKED(IDC_ROUTING_DELETE, &AvayaCtiUI::OnBnClickedRoutingDelete)
 	ON_BN_CLICKED(IDC_ROUTING_SELECT, &AvayaCtiUI::OnBnClickedRoutingSelect)
 	ON_CBN_SELCHANGE(IDC_ROUTING_TYPE, &AvayaCtiUI::OnCbnSelchangeRoutingType)
-	ON_CBN_DROPDOWN(IDC_ROUTING_TYPE, &AvayaCtiUI::OnCbnDropdownRoutingType)
 	ON_BN_CLICKED(IDC_ROUTING_UPDATA, &AvayaCtiUI::OnBnClickedRoutingUpdata)
 	ON_BN_CLICKED(IDC_CLEAR_BTN, &AvayaCtiUI::OnBnClickedClearBtn)
 	ON_BN_CLICKED(IDC_ROUTING_REGISTER, &AvayaCtiUI::OnBnClickedRoutingRegister)
@@ -863,13 +868,6 @@ void AvayaCtiUI::OnCbnSelchangeRoutingType()
 }
 
 
-void AvayaCtiUI::OnCbnDropdownRoutingType()
-{
-	m_cbRoutingType.Clear();
-	m_cbRoutingType.AddString("VIP");
-	m_cbRoutingType.AddString("黑名单");
-	m_cbRoutingType.AddString("重复报警");
-}
 
 
 
